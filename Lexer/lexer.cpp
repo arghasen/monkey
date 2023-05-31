@@ -17,6 +17,7 @@ void Lexer::readChar() {
     position_ = read_position_;
     read_position_++;
 }
+
 token::Token Lexer::NextToken() {
     token::Token tok;
     switch (ch_) {
@@ -56,10 +57,27 @@ token::Token Lexer::NextToken() {
             tok.Type = token::EOFILE;
             tok.Literal = "";
             break;
+        default:
+            if (std::isalpha(ch_)) {
+                tok.Literal = readIdentifier();
+                tok.Type = token::LookupIdent(tok.Literal);
+                return tok;
+            } else {
+                tok.Type = token::ILLEGAL;
+                tok.Literal = "";
+            }
     }
 
     readChar();
     return tok;
 }
+std::string Lexer::readIdentifier() {
+    int start = position_;
+    while (isalpha(ch_)) {
+        readChar();
+    }
+    return input_.substr(start, position_ - start);
+}
+
 } // namespace lexer
 } // namespace monkey

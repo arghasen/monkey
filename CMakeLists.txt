@@ -10,6 +10,7 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 # Add the Monkey Interpreter library
 add_library(MonkeyInterpreter STATIC
     Lexer/lexer.cpp
+    Lexer/token.cpp
 )
 
 add_executable(MonkeyRepl main.cpp)
