@@ -3,19 +3,20 @@
 #include "../Lexer/token.hpp"
 #include "../Lexer/lexer.hpp"
 
+using namespace monkey::token;
 BOOST_AUTO_TEST_CASE(TestNextToken) {
     auto input = "=+(){},;";
 
-    std::vector testResults = {
-        std::make_pair(monkey::token::ASSIGN, "="),
-        std::make_pair(monkey::token::PLUS, "+"),
-        std::make_pair(monkey::token::LPAREN, "("),
-        std::make_pair(monkey::token::RPAREN, ")"),
-        std::make_pair(monkey::token::LBRACE, "{"),
-        std::make_pair(monkey::token::RBRACE, "}"),
-        std::make_pair(monkey::token::COMMA, ","),
-        std::make_pair(monkey::token::SEMICOLON, ";"),
-        std::make_pair(monkey::token::EOFILE, "")
+    std::vector<Token> testResults = {
+        {ASSIGN, "="},
+        {PLUS, "+"},
+        {LPAREN, "("},
+        {RPAREN, ")"},
+        {LBRACE, "{"},
+        {RBRACE, "}"},
+        {COMMA, ","},
+        {SEMICOLON, ";"},
+        {EOFILE, ""}
     };
 
     monkey::lexer::Lexer lexer(input);
@@ -39,45 +40,45 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
 
     monkey::lexer::Lexer lexer(input);
 
-    std::vector testResults = {
-        std::make_pair(monkey::token::LET, "let"),
-        std::make_pair(monkey::token::IDENT, "five"),
-        std::make_pair(monkey::token::ASSIGN, "="),
-        std::make_pair(monkey::token::INT, "5"),
-        std::make_pair(monkey::token::SEMICOLON, ";"),
-        std::make_pair(monkey::token::LET, "let"),
-        std::make_pair(monkey::token::IDENT, "ten"),
-        std::make_pair(monkey::token::ASSIGN, "="),
-        std::make_pair(monkey::token::INT, "10"),
-        std::make_pair(monkey::token::SEMICOLON, ";"),
-        std::make_pair(monkey::token::LET, "let"),
-        std::make_pair(monkey::token::IDENT, "add"),
-        std::make_pair(monkey::token::ASSIGN, "="),
-        std::make_pair(monkey::token::FUNCTION, "fn"),
-        std::make_pair(monkey::token::LPAREN, "("),
-        std::make_pair(monkey::token::IDENT, "x"),
-        std::make_pair(monkey::token::COMMA, ","),
-        std::make_pair(monkey::token::IDENT, "y"),
-        std::make_pair(monkey::token::RPAREN, ")"),
-        std::make_pair(monkey::token::LBRACE, "{"),
-        std::make_pair(monkey::token::IDENT, "x"),
-        std::make_pair(monkey::token::PLUS, "+"),
-        std::make_pair(monkey::token::IDENT, "y"),
-        std::make_pair(monkey::token::SEMICOLON, ";"),
-        std::make_pair(monkey::token::RBRACE, "}"),
-        std::make_pair(monkey::token::SEMICOLON, ";"),
-        std::make_pair(monkey::token::LET, "let"),
-        std::make_pair(monkey::token::IDENT, "result"),
-        std::make_pair(monkey::token::ASSIGN, "="),
-        std::make_pair(monkey::token::IDENT, "add"),
-        std::make_pair(monkey::token::LPAREN, "("),
-        std::make_pair(monkey::token::IDENT, "five"),
-        std::make_pair(monkey::token::COMMA, ","),
-        std::make_pair(monkey::token::IDENT, "ten"),
-        std::make_pair(monkey::token::RPAREN, ")"),
-        std::make_pair(monkey::token::SEMICOLON, ";")
+    std::vector<Token> testResults = {
+        {LET, "let"},
+        {IDENT, "five"},
+        {ASSIGN, "="},
+        {INT, "5"},
+        {SEMICOLON, ";"},
+        {LET, "let"},
+        {IDENT, "ten"},
+        {ASSIGN, "="},
+        {INT, "10"},
+        {SEMICOLON, ";"},
+        {LET, "let"},
+        {IDENT, "add"},
+        {ASSIGN, "="},
+        {FUNCTION, "fn"},
+        {LPAREN, "("},
+        {IDENT, "x"},
+        {COMMA, ","},
+        {IDENT, "y"},
+        {RPAREN, ")"},
+        {LBRACE, "{"},
+        {IDENT, "x"},
+        {PLUS, "+"},
+        {IDENT, "y"},
+        {SEMICOLON, ";"},
+        {RBRACE, "}"},
+        {SEMICOLON, ";"},
+        {LET, "let"},
+        {IDENT, "result"},
+        {ASSIGN, "="},
+        {IDENT, "add"},
+        {LPAREN, "("},
+        {IDENT, "five"},
+        {COMMA, ","},
+        {IDENT, "ten"},
+        {RPAREN, ")"},
+        {SEMICOLON, ";"},
     };
-    
+
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.NextToken();
         BOOST_CHECK_EQUAL(tok.Type, expectedType);

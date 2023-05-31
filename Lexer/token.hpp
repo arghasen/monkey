@@ -12,6 +12,8 @@ namespace token
     {
         TokenType Type;
         std::string Literal;
+        Token() = default;
+        constexpr Token(TokenType type, std::string_view literal) : Type(type), Literal(literal) {};
     };
 
     // constants
