@@ -1,10 +1,11 @@
 
+#pragma once
 #include <string>
 
 namespace monkey{
 namespace token
 {
-    using TokenType = std::string;
+    using TokenType = std::string_view;
 
     struct Token
     {
@@ -36,6 +37,6 @@ namespace token
     // keywords
     constexpr TokenType FUNCTION = "FUNCTION";
     constexpr TokenType LET = "LET";
-    
+
 } // namespace token
 } // namespace monkey
