@@ -1,5 +1,6 @@
-#include <iostream>
 #include "../lexer/lexer.hpp"
+
+#include <iostream>
 #include <version.hpp>
 
 constexpr auto PROMPT = ">> ";

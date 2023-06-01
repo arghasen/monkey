@@ -11,6 +11,8 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 add_library(MonkeyInterpreter STATIC
     lexer/lexer.cpp
     lexer/token.cpp
+    parser/ast.cpp
+    parser/parser.cpp
 )
 
 # Find Git
@@ -34,7 +36,7 @@ target_link_libraries(MonkeyRepl MonkeyInterpreter)
 
 enable_testing()
 
-set(TESTS_SRC tests/lexer_test.cpp)
+set(TESTS_SRC tests/lexer_test.cpp tests/parser_test.cpp)
 # Add the Monkey Interpreter test executable
 add_executable(MonkeyInterpreterTest ${TESTS_SRC})
 

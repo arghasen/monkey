@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "ast.hpp"
 
 namespace monkey{
 namespace parser{
@@ -13,7 +14,7 @@ void Parser::nextToken() {
     peekToken = l->NextToken();
 }
 
- Parser::ParseProgram() {
+ast::Program* Parser::ParseProgram() {
     // while (curToken.Type != lexer::EOFILE) {
     //     nextToken();
     // }
