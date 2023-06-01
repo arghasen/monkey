@@ -11,7 +11,7 @@ namespace lexer
     {
     public:
         Lexer(const std::string &input);
-        lexer::Token NextToken();
+        lexer::Token nextToken();
 
     private:
         std::string input_;

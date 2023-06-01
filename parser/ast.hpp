@@ -2,6 +2,7 @@
 
 #include "../lexer/token.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 namespace monkey {
@@ -31,7 +32,7 @@ public:
   Program() = default;
   ~Program() override = default;
   std::string TokenLiteral() const override;
-  std::vector<Statement *> Statements;
+  std::vector<std::unique_ptr<Statement>> statements;
 };
 
 class Identifier : public Expression {

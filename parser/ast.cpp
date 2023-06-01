@@ -5,10 +5,10 @@ namespace parser {
 namespace ast {
 
 std::string Program::TokenLiteral() const {
-  if (Statements.empty()) {
+  if (statements.empty()) {
     return "";
   }
-  return Statements[0]->TokenLiteral();
+  return statements[0]->TokenLiteral();
 }
 
 std::string Identifier::TokenLiteral() const { return token.Literal; }

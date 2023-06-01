@@ -19,7 +19,7 @@ void Lexer::readChar() {
   read_position_++;
 }
 
-lexer::Token Lexer::NextToken() {
+lexer::Token Lexer::nextToken() {
   Token tok;
 
   skipWhitespace();

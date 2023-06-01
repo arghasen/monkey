@@ -2,6 +2,7 @@
 
 #include "../lexer/lexer.hpp"
 #include "ast.hpp"
+#include <memory>
 
 namespace monkey {
 namespace parser {
@@ -12,10 +13,11 @@ public:
   ~Parser() = default;
 
   void nextToken();
-  ast::Program *ParseProgram();
+  std::unique_ptr<ast::Program> parseProgram();
+  std::unique_ptr<ast::Statement> parseStatement();
 
 private:
-  lexer::Lexer* l;
+  lexer::Lexer *l;
   lexer::Token curToken;
   lexer::Token peekToken;
 };
