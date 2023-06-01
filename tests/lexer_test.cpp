@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE LexerTest
 #include <boost/test/unit_test.hpp>
-#include "../Lexer/token.hpp"
-#include "../Lexer/lexer.hpp"
+#include "../lexer/token.hpp"
+#include "../lexer/lexer.hpp"
 
 using namespace monkey::token;
 BOOST_AUTO_TEST_CASE(TestNextToken) {
@@ -85,10 +85,12 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestNextTokenGibberish) {
+BOOST_AUTO_TEST_CASE(TestNextTokenOperators) {
     auto input = R"(
     !-/*5;
     5 < 10 > 5;
+    10 == 10;
+    10 != 9;
     )";
 
     std::vector<Token> testResults = {
@@ -104,6 +106,52 @@ BOOST_AUTO_TEST_CASE(TestNextTokenGibberish) {
         {GT, ">"},
         {INT, "5"},
         {SEMICOLON, ";"},
+        {INT, "10"},
+        {EQ, "=="},
+        {INT, "10"},
+        {SEMICOLON, ";"},
+        {INT, "10"},
+        {NOT_EQ, "!="},
+        {INT, "9"},
+        {SEMICOLON, ";"},
+        {EOFILE, ""}
+    };
+
+    monkey::lexer::Lexer lexer(input);
+    for (auto& [expectedType, expectedLiteral] : testResults) {
+        auto tok = lexer.NextToken();
+        BOOST_CHECK_EQUAL(tok.Type, expectedType);
+        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
+    auto input = R"(
+    if (5 < 10) {
+        return true;
+    } else {
+        return false;
+    }
+    )";
+
+    std::vector<Token> testResults = {
+        {IF, "if"},
+        {LPAREN, "("},
+        {INT, "5"},
+        {LT, "<"},
+        {INT, "10"},
+        {RPAREN, ")"},
+        {LBRACE, "{"},
+        {RETURN, "return"},
+        {TRUE, "true"},
+        {SEMICOLON, ";"},
+        {RBRACE, "}"},
+        {ELSE, "else"},
+        {LBRACE, "{"},
+        {RETURN, "return"},
+        {FALSE, "false"},
+        {SEMICOLON, ";"},
+        {RBRACE, "}"},
         {EOFILE, ""}
     };
 

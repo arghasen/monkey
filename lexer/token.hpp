@@ -48,6 +48,11 @@ namespace token
     // keywords
     constexpr TokenType FUNCTION = "FUNCTION";
     constexpr TokenType LET = "LET";
+    constexpr TokenType TRUE = "TRUE";
+    constexpr TokenType FALSE = "FALSE";
+    constexpr TokenType IF = "IF";
+    constexpr TokenType ELSE = "ELSE";
+    constexpr TokenType RETURN = "RETURN";
 
     TokenType LookupIdent(const std::string &ident);
 

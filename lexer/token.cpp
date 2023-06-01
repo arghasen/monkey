@@ -4,16 +4,19 @@ namespace monkey{
 namespace token{
 const std::unordered_map<std::string_view, TokenType> keywords = {
     {"fn"sv, FUNCTION},
-    {"let"sv, LET}};
+    {"let"sv, LET},
+    {"true"sv, TRUE},
+    {"false"sv, FALSE},
+    {"if"sv, IF},
+    {"else"sv, ELSE},
+    {"return"sv, RETURN}
+    };
 
 TokenType LookupIdent(const std::string &ident) {
-    if (ident == "fn")
+    auto it = keywords.find(ident);
+    if (it != keywords.end())
     {
-        return FUNCTION;
-    }
-    else if (ident == "let")
-    {
-        return LET;
+        return it->second;
     }
     else
     {
