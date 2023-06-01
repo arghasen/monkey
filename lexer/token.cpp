@@ -1,4 +1,6 @@
 #include "token.hpp"
+#include <ostream>
+#include <unordered_map>
 
 namespace monkey{
 namespace token{
@@ -22,6 +24,11 @@ TokenType LookupIdent(const std::string &ident) {
     {
         return IDENT;
     }
+}
+
+std::ostream& operator<<(std::ostream& os, const Token& tok) {
+    os << "{ Type: " << tok.Type << ", Literal: " << tok.Literal << "}"; 
+    return os;
 }
 } // namespace token
 } // namespace monkey

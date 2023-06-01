@@ -1,7 +1,6 @@
 
 #pragma once
 #include <string>
-#include <unordered_map>
 
 namespace monkey{
 namespace token
@@ -56,5 +55,6 @@ namespace token
 
     TokenType LookupIdent(const std::string &ident);
 
+    std::ostream& operator<<(std::ostream& os, const Token& tok);
 } // namespace token
 } // namespace monkey

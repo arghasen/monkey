@@ -13,7 +13,7 @@ add_library(MonkeyInterpreter STATIC
     lexer/token.cpp
 )
 
-add_executable(MonkeyRepl main.cpp)
+add_executable(MonkeyRepl repl/repl.cpp)
 target_link_libraries(MonkeyRepl MonkeyInterpreter)
 
 enable_testing()
