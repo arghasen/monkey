@@ -3,7 +3,7 @@
 #include "../lexer/token.hpp"
 #include "../lexer/lexer.hpp"
 
-using namespace monkey::token;
+using namespace monkey::lexer;
 BOOST_AUTO_TEST_CASE(TestNextToken) {
     auto input = "=+(){},;";
 

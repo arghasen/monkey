@@ -3,7 +3,7 @@
 #include <string>
 
 namespace monkey{
-namespace token
+namespace lexer
 {
     using TokenType = std::string_view;
     using namespace std::string_view_literals;

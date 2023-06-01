@@ -5,7 +5,7 @@
 constexpr auto PROMPT = ">> ";
 
 int main(){
-    std::cout << "Hello, Monkey! version:" << VERSION << std::endl;
+    std::cout << "Hello, Monkey! version : " << VERSION << std::endl;
     std::cout << "Feel free to type in commands" << std::endl;
     while (1)
     {
@@ -18,7 +18,7 @@ int main(){
         }
         std::cout << input << std::endl;
         monkey::lexer::Lexer l(input);
-        for (auto tok = l.NextToken(); tok.Type != monkey::token::EOFILE; tok = l.NextToken())
+        for (auto tok = l.NextToken(); tok.Type != monkey::lexer::EOFILE; tok = l.NextToken())
         {
             std::cout << tok << std::endl;
         }

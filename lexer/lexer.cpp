@@ -18,8 +18,8 @@ void Lexer::readChar() {
     read_position_++;
 }
 
-token::Token Lexer::NextToken() {
-    token::Token tok;
+lexer::Token Lexer::NextToken() {
+    Token tok;
 
     skipWhitespace();
 
@@ -27,86 +27,86 @@ token::Token Lexer::NextToken() {
         case '=':
             if (peekChar() == '=') {
                 readChar();
-                tok.Type = token::EQ;
+                tok.Type = EQ;
                 tok.Literal = "==";
             } else {
-                tok.Type = token::ASSIGN;
+                tok.Type = ASSIGN;
                 tok.Literal = "=";
             }
             break;
         case '+':
-            tok.Type = token::PLUS;
+            tok.Type = PLUS;
             tok.Literal = "+";
             break;
         case '-':
-            tok.Type = token::MINUS;
+            tok.Type = MINUS;
             tok.Literal = "-";
             break;
         case '!':
             if (peekChar() == '=') {
                 readChar();
-                tok.Type = token::NOT_EQ;
+                tok.Type = NOT_EQ;
                 tok.Literal = "!=";
             } else {
-                tok.Type = token::BANG;
+                tok.Type = BANG;
                 tok.Literal = "!";
             }
             break;
         case '/':
-            tok.Type = token::SLASH;
+            tok.Type = SLASH;
             tok.Literal = "/";
             break;
         case '*':
-            tok.Type = token::ASTERISK;
+            tok.Type = ASTERISK;
             tok.Literal = "*";
             break;
         case '<':
-            tok.Type = token::LT;
+            tok.Type = LT;
             tok.Literal = "<";
             break;
         case '>':
-            tok.Type = token::GT;
+            tok.Type = GT;
             tok.Literal = ">";
             break;
         case ';':
-            tok.Type = token::SEMICOLON;
+            tok.Type = SEMICOLON;
             tok.Literal = ";";
             break;
         case '(':
-            tok.Type = token::LPAREN;
+            tok.Type = LPAREN;
             tok.Literal = "(";
             break;
         case ')':
-            tok.Type = token::RPAREN;
+            tok.Type = RPAREN;
             tok.Literal = ")";
             break;
         case ',':
-            tok.Type = token::COMMA;
+            tok.Type = COMMA;
             tok.Literal = ",";
             break;
         case '{':
-            tok.Type = token::LBRACE;
+            tok.Type = LBRACE;
             tok.Literal = "{";
             break;
         case '}':
-            tok.Type = token::RBRACE;
+            tok.Type = RBRACE;
             tok.Literal = "}";
             break;
         case '\0':
-            tok.Type = token::EOFILE;
+            tok.Type = EOFILE;
             tok.Literal = "";
             break;
         default:
             if (std::isalpha(ch_)) {
                 tok.Literal = readIdentifier();
-                tok.Type = token::LookupIdent(tok.Literal);
+                tok.Type = LookupIdent(tok.Literal);
                 return tok;
             } else if (isdigit(ch_)) {
-                tok.Type = token::INT;
+                tok.Type = INT;
                 tok.Literal = readNumber();
                 return tok;
             }else {
-                tok.Type = token::ILLEGAL;
+                tok.Type = ILLEGAL;
                 tok.Literal = "";
             }
     }

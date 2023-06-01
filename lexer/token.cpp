@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 namespace monkey{
-namespace token{
+namespace lexer{
 const std::unordered_map<std::string_view, TokenType> keywords = {
     {"fn"sv, FUNCTION},
     {"let"sv, LET},
