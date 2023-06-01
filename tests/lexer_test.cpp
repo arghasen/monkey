@@ -38,9 +38,6 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
         let result = add(five, ten);
     )";
 
-    monkey::lexer::Lexer lexer(input);
-    std::cout <<input <<std::endl;
-
     std::vector<Token> testResults = {
         {LET, "let"},
         {IDENT, "five"},
@@ -80,6 +77,37 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
         {SEMICOLON, ";"},
     };
 
+    monkey::lexer::Lexer lexer(input);
+    for (auto& [expectedType, expectedLiteral] : testResults) {
+        auto tok = lexer.NextToken();
+        BOOST_CHECK_EQUAL(tok.Type, expectedType);
+        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(TestNextTokenGibberish) {
+    auto input = R"(
+    !-/*5;
+    5 < 10 > 5;
+    )";
+
+    std::vector<Token> testResults = {
+        {BANG, "!"},
+        {MINUS, "-"},
+        {SLASH, "/"},
+        {ASTERISK, "*"},
+        {INT, "5"},
+        {SEMICOLON, ";"},
+        {INT, "5"},
+        {LT, "<"},
+        {INT, "10"},
+        {GT, ">"},
+        {INT, "5"},
+        {SEMICOLON, ";"},
+        {EOFILE, ""}
+    };
+
+    monkey::lexer::Lexer lexer(input);
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.NextToken();
         BOOST_CHECK_EQUAL(tok.Type, expectedType);

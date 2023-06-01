@@ -27,6 +27,14 @@ namespace token
     // operators
     constexpr TokenType ASSIGN = "="sv;
     constexpr TokenType PLUS = "+"sv;
+    constexpr TokenType MINUS = "-"sv;
+    constexpr TokenType BANG = "!"sv;
+    constexpr TokenType ASTERISK = "*"sv;
+    constexpr TokenType SLASH = "/"sv;
+    constexpr TokenType LT = "<"sv;
+    constexpr TokenType GT = ">"sv;
+    constexpr TokenType EQ = "=="sv;
+    constexpr TokenType NOT_EQ = "!="sv;
 
     // delimiters
     constexpr TokenType COMMA = ","sv;

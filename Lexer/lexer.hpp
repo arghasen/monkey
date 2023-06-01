@@ -23,6 +23,7 @@ namespace lexer
         std::string readNumber();
         std::string readString();
         void skipWhitespace();
+        char peekChar();
     };
 } // namespace lexer
 } // namespace monkey

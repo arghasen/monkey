@@ -25,12 +25,48 @@ token::Token Lexer::NextToken() {
 
     switch (ch_) {
         case '=':
-            tok.Type = token::ASSIGN;
-            tok.Literal = "=";
+            if (peekChar() == '=') {
+                readChar();
+                tok.Type = token::EQ;
+                tok.Literal = "==";
+            } else {
+                tok.Type = token::ASSIGN;
+                tok.Literal = "=";
+            }
             break;
         case '+':
             tok.Type = token::PLUS;
             tok.Literal = "+";
+            break;
+        case '-':
+            tok.Type = token::MINUS;
+            tok.Literal = "-";
+            break;
+        case '!':
+            if (peekChar() == '=') {
+                readChar();
+                tok.Type = token::NOT_EQ;
+                tok.Literal = "!=";
+            } else {
+                tok.Type = token::BANG;
+                tok.Literal = "!";
+            }
+            break;
+        case '/':
+            tok.Type = token::SLASH;
+            tok.Literal = "/";
+            break;
+        case '*':
+            tok.Type = token::ASTERISK;
+            tok.Literal = "*";
+            break;
+        case '<':
+            tok.Type = token::LT;
+            tok.Literal = "<";
+            break;
+        case '>':
+            tok.Type = token::GT;
+            tok.Literal = ">";
             break;
         case ';':
             tok.Type = token::SEMICOLON;
@@ -101,5 +137,12 @@ std::string Lexer::readNumber() {
     return input_.substr(start, position_ - start);
 }
 
+char Lexer::peekChar() {
+    if (read_position_ >= input_.length()) {
+        return '\0';
+    } else {
+        return input_[read_position_];
+    }
+}
 } // namespace lexer
 } // namespace monkey
