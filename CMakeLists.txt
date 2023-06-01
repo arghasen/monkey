@@ -13,7 +13,23 @@ add_library(MonkeyInterpreter STATIC
     lexer/token.cpp
 )
 
+# Find Git
+find_package(Git)
+
+# Get the version string using Git
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Replace the VERSION macro in version.hpp.in with the actual version string
+configure_file(${CMAKE_SOURCE_DIR}/version.hpp.in ${CMAKE_SOURCE_DIR}/version.hpp @ONLY)
+
 add_executable(MonkeyRepl repl/repl.cpp)
+# Add the version.hpp file to the MonkeyInterpreter library
+target_include_directories(MonkeyRepl PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(MonkeyRepl MonkeyInterpreter)
 
 enable_testing()

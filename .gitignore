@@ -23,3 +23,6 @@ build/
 .cache/
 .idea/
 *.sln
+
+#Generated files
+version.hpp

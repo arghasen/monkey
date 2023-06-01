@@ -1,10 +1,11 @@
 #include <iostream>
 #include "../lexer/lexer.hpp"
+#include <version.hpp>
 
 constexpr auto PROMPT = ">> ";
 
 int main(){
-    std::cout << "Hello, Monkey!" << std::endl;
+    std::cout << "Hello, Monkey! version:" << VERSION << std::endl;
     std::cout << "Feel free to type in commands" << std::endl;
     while (1)
     {
