@@ -1,60 +1,64 @@
 
 #pragma once
+#include <cstdint>
 #include <string>
 
-namespace monkey{
-namespace lexer
-{
-    using TokenType = std::string_view;
-    using namespace std::string_view_literals;
-    struct Token
-    {
-        TokenType Type;
-        std::string Literal;
-        Token() = default;
-        constexpr Token(TokenType type, std::string_view literal) : Type(type), Literal(literal) {};
-    };
+namespace monkey {
+namespace lexer {
 
-    // constants
-    constexpr TokenType ILLEGAL = "ILLEGAL"sv;
-    constexpr TokenType EOFILE = "EOF"sv;
-    
-    // Identifiers + literals
-    constexpr TokenType IDENT = "IDENT"sv;
-    constexpr TokenType INT = "INT"sv;
-    
-    // operators
-    constexpr TokenType ASSIGN = "="sv;
-    constexpr TokenType PLUS = "+"sv;
-    constexpr TokenType MINUS = "-"sv;
-    constexpr TokenType BANG = "!"sv;
-    constexpr TokenType ASTERISK = "*"sv;
-    constexpr TokenType SLASH = "/"sv;
-    constexpr TokenType LT = "<"sv;
-    constexpr TokenType GT = ">"sv;
-    constexpr TokenType EQ = "=="sv;
-    constexpr TokenType NOT_EQ = "!="sv;
+enum class TokenType {
 
-    // delimiters
-    constexpr TokenType COMMA = ","sv;
-    constexpr TokenType SEMICOLON = ";"sv;
+  // constants
+  ILLEGAL,
+  EOFILE,
 
-    constexpr TokenType LPAREN = "("sv;
-    constexpr TokenType RPAREN = ")"sv;
-    constexpr TokenType LBRACE = "{"sv;
-    constexpr TokenType RBRACE = "}"sv;
+  // Identifiers + literals
+  IDENT,
+  INT,
 
-    // keywords
-    constexpr TokenType FUNCTION = "FUNCTION";
-    constexpr TokenType LET = "LET";
-    constexpr TokenType TRUE = "TRUE";
-    constexpr TokenType FALSE = "FALSE";
-    constexpr TokenType IF = "IF";
-    constexpr TokenType ELSE = "ELSE";
-    constexpr TokenType RETURN = "RETURN";
+  // operators
+  ASSIGN,
+  PLUS,
+  MINUS,
+  BANG,
+  ASTERISK,
+  SLASH,
+  LT,
+  GT,
+  EQ,
+  NOT_EQ,
 
-    TokenType LookupIdent(const std::string &ident);
+  // delimiters
+  COMMA,
+  SEMICOLON,
 
-    std::ostream& operator<<(std::ostream& os, const Token& tok);
-} // namespace token
+  LPAREN,
+  RPAREN,
+  LBRACE,
+  RBRACE,
+
+  // keywords
+  FUNCTION,
+  LET,
+  TRUE,
+  FALSE,
+  IF,
+  ELSE,
+  RETURN
+};
+
+struct Token {
+  TokenType Type;
+  std::string Literal;
+  Token() = default;
+  constexpr Token(TokenType type, std::string_view literal)
+      : Type(type), Literal(literal){};
+};
+
+TokenType LookupIdent(const std::string &ident);
+
+std::ostream &operator<<(std::ostream &os, const Token &tok);
+std::ostream &operator<<(std::ostream &os, TokenType tok);
+
+} // namespace lexer
 } // namespace monkey

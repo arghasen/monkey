@@ -47,6 +47,7 @@ public:
 class LetStatement : public Statement {
 public:
   LetStatement() = default;
+  explicit LetStatement(lexer::Token tok);
   ~LetStatement() override = default;
   std::string TokenLiteral() const override;
   lexer::Token token;

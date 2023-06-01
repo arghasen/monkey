@@ -15,6 +15,7 @@ public:
   void nextToken();
   std::unique_ptr<ast::Program> parseProgram();
   std::unique_ptr<ast::Statement> parseStatement();
+  std::unique_ptr<ast::LetStatement> parseLetStatement();
 
 private:
   lexer::Lexer *l;

@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "ast.hpp"
+#include <memory>
 
 namespace monkey{
 namespace parser{
@@ -18,7 +19,7 @@ std::unique_ptr<ast::Program> Parser::parseProgram() {
 
     auto program = std::make_unique<ast::Program>();
 
-    while (curToken.Type != lexer::EOFILE) {
+    while (curToken.Type != lexer::TokenType::EOFILE) {
         auto statement = parseStatement();
         if(statement != nullptr){
             program->statements.push_back(std::move(statement));
@@ -29,14 +30,18 @@ std::unique_ptr<ast::Program> Parser::parseProgram() {
 }
 
 std::unique_ptr<ast::Statement> Parser::parseStatement(){
-    // switch(curToken.Type){
-    //     case lexer::LET:
-    //         return parseLetStatement();
-    //     default:
-    //         return nullptr;
-    // }
+    switch(curToken.Type){
+        case lexer::TokenType::LET:
+            return parseLetStatement();
+        default:
+            return nullptr;
+    }
     return nullptr;
 }
 
+std::unique_ptr<ast::LetStatement> Parser::parseLetStatement(){
+    auto letstatement = std::make_unique<ast::LetStatement>(curToken);
+    return nullptr;
+}
 } // namespace parser
 } // namespace monkey

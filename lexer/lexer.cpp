@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "token.hpp"
 #include <cctype>
 
 namespace monkey {
@@ -28,73 +29,73 @@ lexer::Token Lexer::nextToken() {
   case '=':
     if (peekChar() == '=') {
       readChar();
-      tok.Type = EQ;
+      tok.Type = TokenType::EQ;
       tok.Literal = "==";
     } else {
-      tok.Type = ASSIGN;
+      tok.Type = TokenType::ASSIGN;
       tok.Literal = "=";
     }
     break;
   case '+':
-    tok.Type = PLUS;
+    tok.Type = TokenType::PLUS;
     tok.Literal = "+";
     break;
   case '-':
-    tok.Type = MINUS;
+    tok.Type = TokenType::MINUS;
     tok.Literal = "-";
     break;
   case '!':
     if (peekChar() == '=') {
       readChar();
-      tok.Type = NOT_EQ;
+      tok.Type = TokenType::NOT_EQ;
       tok.Literal = "!=";
     } else {
-      tok.Type = BANG;
+      tok.Type = TokenType::BANG;
       tok.Literal = "!";
     }
     break;
   case '/':
-    tok.Type = SLASH;
+    tok.Type = TokenType::SLASH;
     tok.Literal = "/";
     break;
   case '*':
-    tok.Type = ASTERISK;
+    tok.Type = TokenType::ASTERISK;
     tok.Literal = "*";
     break;
   case '<':
-    tok.Type = LT;
+    tok.Type = TokenType::LT;
     tok.Literal = "<";
     break;
   case '>':
-    tok.Type = GT;
+    tok.Type = TokenType::GT;
     tok.Literal = ">";
     break;
   case ';':
-    tok.Type = SEMICOLON;
+    tok.Type = TokenType::SEMICOLON;
     tok.Literal = ";";
     break;
   case '(':
-    tok.Type = LPAREN;
+    tok.Type = TokenType::LPAREN;
     tok.Literal = "(";
     break;
   case ')':
-    tok.Type = RPAREN;
+    tok.Type = TokenType::RPAREN;
     tok.Literal = ")";
     break;
   case ',':
-    tok.Type = COMMA;
+    tok.Type = TokenType::COMMA;
     tok.Literal = ",";
     break;
   case '{':
-    tok.Type = LBRACE;
+    tok.Type = TokenType::LBRACE;
     tok.Literal = "{";
     break;
   case '}':
-    tok.Type = RBRACE;
+    tok.Type = TokenType::RBRACE;
     tok.Literal = "}";
     break;
   case '\0':
-    tok.Type = EOFILE;
+    tok.Type = TokenType::EOFILE;
     tok.Literal = "";
     break;
   default:
@@ -103,11 +104,11 @@ lexer::Token Lexer::nextToken() {
       tok.Type = LookupIdent(tok.Literal);
       return tok;
     } else if (isdigit(ch_)) {
-      tok.Type = INT;
+      tok.Type = TokenType::INT;
       tok.Literal = readNumber();
       return tok;
     } else {
-      tok.Type = ILLEGAL;
+      tok.Type = TokenType::ILLEGAL;
       tok.Literal = "";
     }
   }
