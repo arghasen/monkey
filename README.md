@@ -10,3 +10,6 @@ A basic lexer which supports the following features
 - Booleans
 - Functions
 - Operators
+
+## Parser (WIP)
+AST based parser
