@@ -29,16 +29,17 @@ BOOST_AUTO_TEST_CASE(TestNextToken) {
 }
 
 BOOST_AUTO_TEST_CASE(TestNextToken2) {
-    auto input = R"(\
+    auto input = R"(
         let five = 5;
         let ten = 10;
         let add = fn(x, y) {
             x + y;
         };
         let result = add(five, ten);
-    \)";
+    )";
 
     monkey::lexer::Lexer lexer(input);
+    std::cout <<input <<std::endl;
 
     std::vector<Token> testResults = {
         {LET, "let"},
