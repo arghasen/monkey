@@ -69,9 +69,10 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
   if (!expectPeek(lexer::TokenType::ASSIGN)) {
     return nullptr;
   }
-  // Todo: We're skipping the expressions until we encounter a semicolon
-  while (not curTokenIs(lexer::TokenType::SEMICOLON)) {
-    nextToken();
+  nextToken();
+  letstatement->value = parseExpression(Precedence::LOWEST);
+  if (peekTokenIs(lexer::TokenType::SEMICOLON)) {
+      nextToken();
   }
   return letstatement;
 }
@@ -79,8 +80,8 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
 std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
   auto returnStatement = std::make_unique<ast::ReturnStatement>(curToken);
   nextToken();
-  // Todo: We're skipping the expressions until we encounter a semicolon
-  while (not curTokenIs(lexer::TokenType::SEMICOLON)) {
+  returnStatement->returnValue = parseExpression(Precedence::LOWEST);
+  if (peekTokenIs(lexer::TokenType::SEMICOLON)) {
     nextToken();
   }
   return returnStatement;
