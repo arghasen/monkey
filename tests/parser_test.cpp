@@ -1,5 +1,6 @@
 #include "../parser/parser.hpp"
 #include <boost/test/unit_test.hpp>
+#include <variant>
 
 using namespace monkey::parser;
 using namespace monkey::parser::ast;
@@ -208,22 +209,10 @@ BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing){
     {"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
     {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
     {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-    // 		{
-		// 	"true",
-		// 	"true",
-		// },
-		// {
-		// 	"false",
-		// 	"false",
-		// },
-		// {
-		// 	"3 > 5 == false",
-		// 	"((3 > 5) == false)",
-		// },
-		// {
-		// 	"3 < 5 == true",
-		// 	"((3 < 5) == true)",
-		// },
+    { "true","true", },
+		{"false","false",},
+		{ "3 > 5 == false", "((3 > 5) == false)", },
+		{ "3 < 5 == true", "((3 < 5) == true)", },
 		// {
 		// 	"1 + (2 + 3) + 4",
 		// 	"((1 + (2 + 3)) + 4)",
@@ -270,5 +259,26 @@ BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing){
     BOOST_REQUIRE_NE(program, nullptr);
     auto actual = program->to_string();
     BOOST_REQUIRE_EQUAL(actual, expectedResults);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TestBooleanParsing){
+  std::vector<std::pair<std::string, bool>> tests = {
+    {"true;", true},
+    {"false;", false},
+  };
+
+  for(auto [input, expected] : tests){
+    monkey::lexer::Lexer l(input);
+    Parser p(&l);
+    auto program = p.parseProgram();
+    checkParserErrors(p);
+    BOOST_REQUIRE_NE(program, nullptr);
+    BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+    auto stmt = program->statements[0].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto boolean = getAs<Boolean>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(boolean->value, expected);
+    BOOST_REQUIRE_EQUAL(boolean->TokenLiteral(), expected ? "true" : "false");
   }
 }

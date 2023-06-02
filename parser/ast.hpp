@@ -110,7 +110,7 @@ public:
 
 class Boolean : public Expression {
 public:
-  explicit Boolean(lexer::Token tok);
+  Boolean(lexer::Token tok, bool val);
   ~Boolean() override = default;
   bool value;
 };
