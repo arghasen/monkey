@@ -46,7 +46,11 @@ target_link_libraries(MonkeyRepl MonkeyInterpreter)
 
 enable_testing()
 
-set(TESTS_SRC tests/lexer_test.cpp tests/parser_test.cpp)
+set(TESTS_SRC 
+    tests/lexer_test.cpp 
+    tests/parser_test.cpp
+    tests/ast_test.cpp
+    )
 # Add the Monkey Interpreter test executable
 add_executable(MonkeyInterpreterTest ${TESTS_SRC})
 
