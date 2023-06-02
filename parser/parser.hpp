@@ -2,41 +2,42 @@
 
 #include "../lexer/lexer.hpp"
 #include "ast.hpp"
+#include <functional>
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 
 namespace monkey {
 namespace parser {
 class Parser;
 
 using PrefixParseFn = std::function<std::unique_ptr<ast::Expression>()>;
-using InfixParseFn = std::function<std::unique_ptr<ast::Expression>(std::unique_ptr<ast::Expression>)>;
+using InfixParseFn = std::function<std::unique_ptr<ast::Expression>(
+    std::unique_ptr<ast::Expression>)>;
 using Expression = std::unique_ptr<ast::Expression>;
 using Errors = std::vector<std::string>;
 
-enum class Precedence{
+enum class Precedence {
   LOWEST,
-  EQUALS, // ==
+  EQUALS,      // ==
   LESSGREATER, // > or <
-  SUM, // +
-  PRODUCT, // *
-  PREFIX, // -X or !X
-  CALL, // myFunction(X)
-  INDEX // array[index]
+  SUM,         // +
+  PRODUCT,     // *
+  PREFIX,      // -X or !X
+  CALL,        // myFunction(X)
+  INDEX        // array[index]
 };
 
 const std::unordered_map<lexer::TokenType, Precedence> precedences = {
-  {lexer::TokenType::EQ, Precedence::EQUALS},
-  {lexer::TokenType::NOT_EQ, Precedence::EQUALS},
-  {lexer::TokenType::LT, Precedence::LESSGREATER},
-  {lexer::TokenType::GT, Precedence::LESSGREATER},
-  {lexer::TokenType::PLUS, Precedence::SUM},
-  {lexer::TokenType::MINUS, Precedence::SUM},
-  {lexer::TokenType::SLASH, Precedence::PRODUCT},
-  {lexer::TokenType::ASTERISK, Precedence::PRODUCT},
+    {lexer::TokenType::EQ, Precedence::EQUALS},
+    {lexer::TokenType::NOT_EQ, Precedence::EQUALS},
+    {lexer::TokenType::LT, Precedence::LESSGREATER},
+    {lexer::TokenType::GT, Precedence::LESSGREATER},
+    {lexer::TokenType::PLUS, Precedence::SUM},
+    {lexer::TokenType::MINUS, Precedence::SUM},
+    {lexer::TokenType::SLASH, Precedence::PRODUCT},
+    {lexer::TokenType::ASTERISK, Precedence::PRODUCT},
 };
 
 class Parser {
@@ -59,9 +60,12 @@ private:
   Expression parsePrefixExpression();
   Expression parseInfixExpression(Expression left);
   Expression parseBoolean();
+  Expression parseGroupedExpression();
+  Expression parseIfExpression();
+  std::unique_ptr<ast::BlockStatement> parseBlockStatement();
 
   void noPrefixParseFnError(lexer::TokenType type);
-  
+
   Precedence peekPrecedence();
   Precedence curPrecedence();
 
@@ -78,7 +82,6 @@ private:
   Errors errors;
   std::unordered_map<lexer::TokenType, PrefixParseFn> prefixParseFns;
   std::unordered_map<lexer::TokenType, InfixParseFn> infixParseFns;
-
 };
 
 } // namespace parser

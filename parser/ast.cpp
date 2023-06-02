@@ -21,7 +21,8 @@ Expression::Expression(lexer::Token tok) : token(tok) {}
 
 LetStatement::LetStatement(lexer::Token tok) : Statement(tok) {}
 
-Identifier::Identifier(lexer::Token tok) : Expression(tok), value(tok.literal) {}
+Identifier::Identifier(lexer::Token tok)
+    : Expression(tok), value(tok.literal) {}
 
 ReturnStatement::ReturnStatement(lexer::Token tok) : Statement(tok) {}
 
@@ -37,6 +38,12 @@ InfixExpression::InfixExpression(lexer::Token tok)
     : Expression(tok), left(nullptr), op(tok.literal), right(nullptr) {}
 
 Boolean::Boolean(lexer::Token tok, bool val) : Expression(tok), value(val) {}
+
+IfExpression::IfExpression(lexer::Token tok)
+    : Expression(tok), condition(nullptr), consequence(nullptr),
+      alternative(nullptr) {}
+
+BlockStatement::BlockStatement(lexer::Token tok) : Statement(tok) {}
 
 std::string Expression::to_string() const { return token.literal; }
 
@@ -93,6 +100,26 @@ std::string InfixExpression::to_string() const {
     out += right->to_string();
   }
   out += ")";
+  return out;
+}
+
+std::string IfExpression::to_string() const {
+  std::string out = "if";
+  if (condition) {
+    out += condition->to_string();
+  }
+  out += " " + consequence->to_string();
+  if (alternative) {
+    out += "else " + alternative->to_string();
+  }
+  return out;
+}
+
+std::string BlockStatement::to_string() const {
+  std::string out;
+  for (const auto &stmt : statements) {
+    out += stmt->to_string();
+  }
   return out;
 }
 
