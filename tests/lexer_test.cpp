@@ -23,8 +23,8 @@ BOOST_AUTO_TEST_CASE(TestNextToken) {
 
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.nextToken();
-        BOOST_CHECK_EQUAL(tok.Type, expectedType);
-        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+        BOOST_CHECK_EQUAL(tok.type, expectedType);
+        BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
     }
 }
 
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
     monkey::lexer::Lexer lexer(input);
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.nextToken();
-        BOOST_CHECK_EQUAL(tok.Type, expectedType);
-        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+        BOOST_CHECK_EQUAL(tok.type, expectedType);
+        BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
     }
 }
 
@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE(TestNextTokenOperators) {
     monkey::lexer::Lexer lexer(input);
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.nextToken();
-        BOOST_CHECK_EQUAL(tok.Type, expectedType);
-        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+        BOOST_CHECK_EQUAL(tok.type, expectedType);
+        BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
     }
 }
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
     monkey::lexer::Lexer lexer(input);
     for (auto& [expectedType, expectedLiteral] : testResults) {
         auto tok = lexer.nextToken();
-        BOOST_CHECK_EQUAL(tok.Type, expectedType);
-        BOOST_CHECK_EQUAL(tok.Literal, expectedLiteral);
+        BOOST_CHECK_EQUAL(tok.type, expectedType);
+        BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
     }
 }

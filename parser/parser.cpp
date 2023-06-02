@@ -19,7 +19,7 @@ std::unique_ptr<ast::Program> Parser::parseProgram() {
 
     auto program = std::make_unique<ast::Program>();
 
-    while (curToken.Type != lexer::TokenType::EOFILE) {
+    while (curToken.type != lexer::TokenType::EOFILE) {
         auto statement = parseStatement();
         if(statement != nullptr){
             program->statements.push_back(std::move(statement));
@@ -30,7 +30,7 @@ std::unique_ptr<ast::Program> Parser::parseProgram() {
 }
 
 std::unique_ptr<ast::Statement> Parser::parseStatement(){
-    switch(curToken.Type){
+    switch(curToken.type){
         case lexer::TokenType::LET:
             return parseLetStatement();
         default:
@@ -41,7 +41,27 @@ std::unique_ptr<ast::Statement> Parser::parseStatement(){
 
 std::unique_ptr<ast::LetStatement> Parser::parseLetStatement(){
     auto letstatement = std::make_unique<ast::LetStatement>(curToken);
-    return nullptr;
+    if(!expectPeek(lexer::TokenType::IDENT)){
+        return nullptr;
+    }
+    letstatement->name = std::make_unique<ast::Identifier>(curToken);
+    if(!expectPeek(lexer::TokenType::ASSIGN)){
+        return nullptr;
+    }
+    // Todo: We're skipping the expressions until we encounter a semicolon
+    while(curToken.type != lexer::TokenType::SEMICOLON){
+        nextToken();
+    }
+    return letstatement;
+}
+
+bool Parser::expectPeek(lexer::TokenType type){
+    if(peekToken.type == type){
+        nextToken();
+        return true;
+    }else{
+        return false;
+    }
 }
 } // namespace parser
 } // namespace monkey

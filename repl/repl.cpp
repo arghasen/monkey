@@ -18,7 +18,7 @@ int main() {
     }
     std::cout << input << std::endl;
     monkey::lexer::Lexer l(input);
-    for (auto tok = l.nextToken(); tok.Type != monkey::lexer::TokenType::EOFILE;
+    for (auto tok = l.nextToken(); tok.type != monkey::lexer::TokenType::EOFILE;
          tok = l.nextToken()) {
       std::cout << tok << std::endl;
     }

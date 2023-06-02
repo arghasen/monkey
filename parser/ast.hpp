@@ -38,10 +38,11 @@ public:
 class Identifier : public Expression {
 public:
   Identifier() = default;
+  explicit Identifier(lexer::Token tok);
   ~Identifier() override = default;
   std::string TokenLiteral() const override;
   lexer::Token token;
-  std::string Value;
+  std::string value;
 };
 
 class LetStatement : public Statement {
@@ -51,8 +52,8 @@ public:
   ~LetStatement() override = default;
   std::string TokenLiteral() const override;
   lexer::Token token;
-  Identifier *Name;
-  Expression *Value;
+  std::unique_ptr<Identifier> name;
+  std::unique_ptr<Expression> value;
 };
 
 } // namespace ast

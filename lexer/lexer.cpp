@@ -29,87 +29,87 @@ lexer::Token Lexer::nextToken() {
   case '=':
     if (peekChar() == '=') {
       readChar();
-      tok.Type = TokenType::EQ;
-      tok.Literal = "==";
+      tok.type = TokenType::EQ;
+      tok.literal = "==";
     } else {
-      tok.Type = TokenType::ASSIGN;
-      tok.Literal = "=";
+      tok.type = TokenType::ASSIGN;
+      tok.literal = "=";
     }
     break;
   case '+':
-    tok.Type = TokenType::PLUS;
-    tok.Literal = "+";
+    tok.type = TokenType::PLUS;
+    tok.literal = "+";
     break;
   case '-':
-    tok.Type = TokenType::MINUS;
-    tok.Literal = "-";
+    tok.type = TokenType::MINUS;
+    tok.literal = "-";
     break;
   case '!':
     if (peekChar() == '=') {
       readChar();
-      tok.Type = TokenType::NOT_EQ;
-      tok.Literal = "!=";
+      tok.type = TokenType::NOT_EQ;
+      tok.literal = "!=";
     } else {
-      tok.Type = TokenType::BANG;
-      tok.Literal = "!";
+      tok.type = TokenType::BANG;
+      tok.literal = "!";
     }
     break;
   case '/':
-    tok.Type = TokenType::SLASH;
-    tok.Literal = "/";
+    tok.type = TokenType::SLASH;
+    tok.literal = "/";
     break;
   case '*':
-    tok.Type = TokenType::ASTERISK;
-    tok.Literal = "*";
+    tok.type = TokenType::ASTERISK;
+    tok.literal = "*";
     break;
   case '<':
-    tok.Type = TokenType::LT;
-    tok.Literal = "<";
+    tok.type = TokenType::LT;
+    tok.literal = "<";
     break;
   case '>':
-    tok.Type = TokenType::GT;
-    tok.Literal = ">";
+    tok.type = TokenType::GT;
+    tok.literal = ">";
     break;
   case ';':
-    tok.Type = TokenType::SEMICOLON;
-    tok.Literal = ";";
+    tok.type = TokenType::SEMICOLON;
+    tok.literal = ";";
     break;
   case '(':
-    tok.Type = TokenType::LPAREN;
-    tok.Literal = "(";
+    tok.type = TokenType::LPAREN;
+    tok.literal = "(";
     break;
   case ')':
-    tok.Type = TokenType::RPAREN;
-    tok.Literal = ")";
+    tok.type = TokenType::RPAREN;
+    tok.literal = ")";
     break;
   case ',':
-    tok.Type = TokenType::COMMA;
-    tok.Literal = ",";
+    tok.type = TokenType::COMMA;
+    tok.literal = ",";
     break;
   case '{':
-    tok.Type = TokenType::LBRACE;
-    tok.Literal = "{";
+    tok.type = TokenType::LBRACE;
+    tok.literal = "{";
     break;
   case '}':
-    tok.Type = TokenType::RBRACE;
-    tok.Literal = "}";
+    tok.type = TokenType::RBRACE;
+    tok.literal = "}";
     break;
   case '\0':
-    tok.Type = TokenType::EOFILE;
-    tok.Literal = "";
+    tok.type = TokenType::EOFILE;
+    tok.literal = "";
     break;
   default:
     if (std::isalpha(ch_)) {
-      tok.Literal = readIdentifier();
-      tok.Type = LookupIdent(tok.Literal);
+      tok.literal = readIdentifier();
+      tok.type = LookupIdent(tok.literal);
       return tok;
     } else if (isdigit(ch_)) {
-      tok.Type = TokenType::INT;
-      tok.Literal = readNumber();
+      tok.type = TokenType::INT;
+      tok.literal = readNumber();
       return tok;
     } else {
-      tok.Type = TokenType::ILLEGAL;
-      tok.Literal = "";
+      tok.type = TokenType::ILLEGAL;
+      tok.literal = "";
     }
   }
 

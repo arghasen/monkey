@@ -48,11 +48,11 @@ enum class TokenType {
 };
 
 struct Token {
-  TokenType Type;
-  std::string Literal;
+  TokenType type;
+  std::string literal;
   Token() = default;
   constexpr Token(TokenType type, std::string_view literal)
-      : Type(type), Literal(literal){};
+      : type(type), literal(literal){};
 };
 
 TokenType LookupIdent(const std::string &ident);

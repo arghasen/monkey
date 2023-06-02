@@ -56,7 +56,7 @@ std::ostream &operator<<(std::ostream &os, TokenType tok ){
 }
 
 std::ostream &operator<<(std::ostream &os, const Token &tok) {
-  os << "{ Type: " << tok.Type << ", Literal: " << tok.Literal << "}";
+  os << "{ Type: " << tok.type << ", Literal: " << tok.literal << "}";
   return os;
 }
 } // namespace lexer

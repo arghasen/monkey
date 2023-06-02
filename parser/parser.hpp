@@ -14,10 +14,12 @@ public:
 
   void nextToken();
   std::unique_ptr<ast::Program> parseProgram();
+  
+private:
   std::unique_ptr<ast::Statement> parseStatement();
   std::unique_ptr<ast::LetStatement> parseLetStatement();
+  bool expectPeek(lexer::TokenType type);
 
-private:
   lexer::Lexer *l;
   lexer::Token curToken;
   lexer::Token peekToken;
