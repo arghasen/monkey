@@ -45,6 +45,12 @@ IfExpression::IfExpression(lexer::Token tok)
 
 BlockStatement::BlockStatement(lexer::Token tok) : Statement(tok) {}
 
+FunctionLiteral::FunctionLiteral(lexer::Token tok)
+    : Expression(tok), body{nullptr} {}
+
+CallExpression::CallExpression(lexer::Token tok)
+    : Expression(tok), function{nullptr}, arguments{} {}
+
 std::string Expression::to_string() const { return token.literal; }
 
 std::string Program::to_string() const {
@@ -120,6 +126,32 @@ std::string BlockStatement::to_string() const {
   for (const auto &stmt : statements) {
     out += stmt->to_string();
   }
+  return out;
+}
+
+std::string FunctionLiteral::to_string() const {
+  std::string out = token.literal + "(";
+  if (parameters.size() > 0) {
+    for (const auto &param : parameters) {
+      out += param->to_string() + ", ";
+    }
+    out.pop_back();
+    out.pop_back();
+  }
+  out += ") " + body->to_string();
+  return out;
+}
+
+std::string CallExpression::to_string() const {
+  std::string out = function->to_string() + "(";
+  if (arguments.size() > 0) {
+    for (const auto &arg : arguments) {
+      out += arg->to_string() + ", ";
+    }
+    out.pop_back();
+    out.pop_back();
+  }
+  out += ")";
   return out;
 }
 

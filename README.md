@@ -18,4 +18,15 @@ AST based parser
 ### Statements
 - Let Statements
 - Return Statements
+- Block Statements
 ### Expressions
+- Identifiers
+- Integers
+- Booleans
+- Expressions
+- Operator Precedence
+- Prefix operators
+- Infix operators
+- if/else 
+- Grouped Expressions
+
