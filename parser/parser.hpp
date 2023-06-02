@@ -44,6 +44,9 @@ private:
   std::unique_ptr<ast::Expression> parseExpression(Precedence precedence);
   std::unique_ptr<ast::Expression> parseIdentifier();
   std::unique_ptr<ast::Expression> parseIntegerLiteral();
+  std::unique_ptr<ast::Expression> parsePrefixExpression();
+
+  void noPrefixParseFnError(lexer::TokenType type);
   
   bool expectPeek(lexer::TokenType type);
   bool curTokenIs(lexer::TokenType type);

@@ -21,6 +21,8 @@ std::string ExpressionStatement::TokenLiteral() const {return token.literal; }
 
 std::string IntegerLiteral::TokenLiteral() const { return token.literal; }
 
+std::string PrefixExpression::TokenLiteral() const { return token.literal; }
+
 LetStatement::LetStatement(lexer::Token tok) : token(tok) {}
 
 Identifier::Identifier(lexer::Token tok) : token(tok), value(tok.literal) {}
@@ -29,8 +31,11 @@ ReturnStatement::ReturnStatement(lexer::Token tok) : token(tok) {}
 
 ExpressionStatement::ExpressionStatement(lexer::Token tok)
     : token(tok), expression(nullptr) {}
-    
+
 IntegerLiteral::IntegerLiteral(lexer::Token tok) : token(tok) {}
+
+PrefixExpression::PrefixExpression(lexer::Token tok)
+    : token(tok), op(tok.literal), right(nullptr) {}
 
 std::string Program::to_string() const {
   std::string out;
@@ -67,6 +72,15 @@ std::string ExpressionStatement::to_string() const {
 }
 
 std::string IntegerLiteral::to_string() const { return token.literal; }
+
+std::string PrefixExpression::to_string() const {
+  std::string out = "(" + op;
+  if (right) {
+    out += right->to_string();
+  }
+  out += ")";
+  return out;
+}
 
 } // namespace ast
 } // namespace parser

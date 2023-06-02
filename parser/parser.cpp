@@ -11,6 +11,8 @@ Parser::Parser(lexer::Lexer* l) : l(l) {
 
     registerPrefix(lexer::TokenType::IDENT, &Parser::parseIdentifier);
     registerPrefix(lexer::TokenType::INT, &Parser::parseIntegerLiteral);
+    registerPrefix(lexer::TokenType::BANG, &Parser::parsePrefixExpression);
+    registerPrefix(lexer::TokenType::MINUS, &Parser::parsePrefixExpression);
 }
 
 void Parser::nextToken() {
@@ -78,9 +80,15 @@ std::unique_ptr<ast::ExpressionStatement> Parser::parseExpressionStatement(){
     return expressionStatement;
 }
 
+void Parser::noPrefixParseFnError(lexer::TokenType type){
+    std::string msg = "no prefix parse function for " + lexer::to_string(type) + " found";
+    errors.push_back(msg);
+}
+
 std::unique_ptr<ast::Expression> Parser::parseExpression(Precedence precedence){
     auto prefix = prefixParseFns[curToken.type];
     if(prefix == nullptr){
+        noPrefixParseFnError(curToken.type);
         return nullptr;
     }
     auto leftExp = prefix();
@@ -103,6 +111,13 @@ std::unique_ptr<ast::Expression> Parser::parseIntegerLiteral(){
     }
     literal->value = value;
     return literal;
+}
+
+std::unique_ptr<ast::Expression> Parser::parsePrefixExpression(){
+    auto expression = std::make_unique<ast::PrefixExpression>(curToken);
+    nextToken();
+    expression->right = parseExpression(Precedence::PREFIX);
+    return expression;
 }
 
 bool Parser::curTokenIs(lexer::TokenType type){

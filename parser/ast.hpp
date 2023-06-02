@@ -95,6 +95,18 @@ public:
   int64_t value;
 };
 
+class PrefixExpression : public Expression {
+public:
+  PrefixExpression() = default;
+  PrefixExpression(lexer::Token tok);
+  ~PrefixExpression() override = default;
+  std::string TokenLiteral() const override;
+  std::string to_string() const override;
+  lexer::Token token;
+  std::string op;
+  std::unique_ptr<Expression> right;
+};
+
 } // namespace ast
 } // namespace parser
 } // namespace monkey

@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE(TestLetStatements) {
   Parser p(&l);
 
   auto program = p.parseProgram();
+  checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 3);
-  checkParserErrors(p);
   std::vector expectedIdentifiers = {"x", "y", "foobar"};
   for(auto counter=0; auto expectedIdentifier : expectedIdentifiers){
       auto stmt = program->statements[counter].get();
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(TestLetStatementsFailures) {
 
   auto program = p.parseProgram();
   BOOST_REQUIRE_NE(program, nullptr);
-  BOOST_REQUIRE_EQUAL(p.getErrors().size(), 3);
+  BOOST_REQUIRE_EQUAL(p.getErrors().size(), 5); // TODO: assign, semicolon extra expecting to get parsed
 }
 
 BOOST_AUTO_TEST_CASE(TestReturnStatements){
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(TestReturnStatements){
   Parser p(&l);
 
   auto program = p.parseProgram();
+  checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 3);
-  checkParserErrors(p);
 
   for(auto& stmt : program->statements){
     auto returnStmt = getAs<ReturnStatement>(stmt.get());
@@ -95,13 +95,14 @@ BOOST_AUTO_TEST_CASE(TestIdentifierExpression){
   monkey::lexer::Lexer l(input);
   Parser p(&l);
   auto program = p.parseProgram();
+  checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
-  checkParserErrors(p);
   auto stmt = program->statements[0].get();
   auto exprStmt = getAs<ExpressionStatement>(stmt);
   auto ident = getAs<Identifier>(exprStmt->expression.get());
   BOOST_REQUIRE_EQUAL(ident->TokenLiteral(), "foobar");
+  BOOST_REQUIRE_EQUAL(ident->value, "foobar");
 }
 
 BOOST_AUTO_TEST_CASE(TestIntegerLiteralExpression){
@@ -109,11 +110,40 @@ BOOST_AUTO_TEST_CASE(TestIntegerLiteralExpression){
   monkey::lexer::Lexer l(input);
   Parser p(&l);
   auto program = p.parseProgram();
+  checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
-  checkParserErrors(p);
   auto stmt = program->statements[0].get();
   auto exprStmt = getAs<ExpressionStatement>(stmt);
   auto literal = getAs<IntegerLiteral>(exprStmt->expression.get());
   BOOST_REQUIRE_EQUAL(literal->TokenLiteral(), "5");
+  BOOST_REQUIRE_EQUAL(literal->value, 5);
+}
+
+BOOST_AUTO_TEST_CASE(TestParsingPrefixExpressions){
+  auto input = R"(
+    !5;
+    -15;
+  )";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 2);
+  std::vector<std::pair<std::string,std::string>> tests = {
+    {"!", "5"},
+    {"-", "15"}
+  };
+  for(auto counter=0; auto test : tests){
+    auto stmt = program->statements[counter].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto prefixExpr = getAs<PrefixExpression>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(prefixExpr->op, test.first);
+    BOOST_REQUIRE_EQUAL(prefixExpr->TokenLiteral(), test.first);
+    auto intLiteral = getAs<IntegerLiteral>(prefixExpr->right.get());
+    BOOST_REQUIRE_EQUAL(intLiteral->value, std::stoi(test.second));
+    BOOST_REQUIRE_EQUAL(intLiteral->TokenLiteral(), test.second);
+    counter++;
+  }
 }
