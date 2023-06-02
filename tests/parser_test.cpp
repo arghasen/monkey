@@ -221,18 +221,9 @@ BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing){
     { "(5 + 5) * 2 * (5 + 5)", "(((5 + 5) * 2) * (5 + 5))", },
     { "-(5 + 5)", "(-(5 + 5))", },
     { "!(true == true)", "(!(true == true))", },
-		// {
-		// 	"a + add(b * c) + d",
-		// 	"((a + add((b * c))) + d)",
-		// },
-		// {
-		// 	"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))",
-		// 	"add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))",
-		// },
-		// {
-		// 	"add(a + b + c * d / f + g)",
-		// 	"add((((a + b) + ((c * d) / f)) + g))",
-		// },
+		{ "a + add(b * c) + d", "((a + add((b * c))) + d)", },
+		{ "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))", },
+		{ "add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))", },
   };
 
   for(auto [input, expectedResults] : tests){
@@ -312,4 +303,99 @@ BOOST_AUTO_TEST_CASE(TestIfElseExpression){
   auto alternative = ifExpr->alternative->statements[0].get();
   auto alternativeExpr = getAs<ExpressionStatement>(alternative);
   BOOST_REQUIRE_EQUAL(alternativeExpr->expression->TokenLiteral(), "y");
+}
+
+BOOST_AUTO_TEST_CASE(TestFunctionLiteralParsing){
+  std::string input = "fn(x, y) { x + y; }";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto func = getAs<FunctionLiteral>(exprStmt->expression.get());
+  BOOST_REQUIRE_EQUAL(func->parameters.size(), 2);
+  BOOST_REQUIRE_EQUAL(func->parameters[0]->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(func->parameters[1]->TokenLiteral(), "y");
+  BOOST_REQUIRE_EQUAL(func->body->statements.size(), 1);
+  auto bodyStmt = func->body->statements[0].get();
+  auto bodyExpr = getAs<ExpressionStatement>(bodyStmt);
+  auto bodyInfix = getAs<InfixExpression>(bodyExpr->expression.get());
+  BOOST_REQUIRE_EQUAL(bodyInfix->left->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(bodyInfix->op, "+");
+  BOOST_REQUIRE_EQUAL(bodyInfix->right->TokenLiteral(), "y");
+}
+
+BOOST_AUTO_TEST_CASE(TestFunctionParameters){
+  std::vector<std::pair<std::string, std::vector<std::string>>> tests = {
+    {"fn() {};", {}},
+    {"fn(x) {};", {"x"}},
+    {"fn(x, y, z) {};", {"x", "y", "z"}},
+  };
+
+  for(auto [input, expected] : tests){
+    monkey::lexer::Lexer l(input);
+    Parser p(&l);
+    auto program = p.parseProgram();
+    checkParserErrors(p);
+    BOOST_REQUIRE_NE(program, nullptr);
+    BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+    auto stmt = program->statements[0].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto func = getAs<FunctionLiteral>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(func->parameters.size(), expected.size());
+    for(int i = 0; i < expected.size(); i++){
+      BOOST_REQUIRE_EQUAL(func->parameters[i]->TokenLiteral(), expected[i]);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TestCallExpressions){
+  std::string input = "add(1, 2 * 3, 4 + 5);";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto call = getAs<CallExpression>(exprStmt->expression.get());
+  BOOST_REQUIRE_EQUAL(call->function->TokenLiteral(), "add");
+  BOOST_REQUIRE_EQUAL(call->arguments.size(), 3);
+  BOOST_REQUIRE_EQUAL(call->arguments[0]->TokenLiteral(), "1");
+  auto arg1 = getAs<InfixExpression>(call->arguments[1].get());
+  BOOST_REQUIRE_EQUAL(arg1->left->TokenLiteral(), "2");
+  BOOST_REQUIRE_EQUAL(arg1->op, "*");
+  BOOST_REQUIRE_EQUAL(arg1->right->TokenLiteral(), "3");
+  auto arg2 = getAs<InfixExpression>(call->arguments[2].get());
+  BOOST_REQUIRE_EQUAL(arg2->left->TokenLiteral(), "4");
+  BOOST_REQUIRE_EQUAL(arg2->op, "+");
+  BOOST_REQUIRE_EQUAL(arg2->right->TokenLiteral(), "5");
+}
+
+BOOST_AUTO_TEST_CASE(TestCallArgumentsParsing){
+  std::vector<std::pair<std::string, std::vector<std::string>>> tests = {
+    {"add();", {}},
+    {"add(1);", {"1"}},
+    {"add(1, 2 * 3, 4 + 5);", {"1", "(2 * 3)", "(4 + 5)"}},
+  };
+
+  for(auto [input, expected] : tests){
+    monkey::lexer::Lexer l(input);
+    Parser p(&l);
+    auto program = p.parseProgram();
+    checkParserErrors(p);
+    BOOST_REQUIRE_NE(program, nullptr);
+    BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+    auto stmt = program->statements[0].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto call = getAs<CallExpression>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(call->arguments.size(), expected.size());
+    for(int i = 0; i < expected.size(); i++){
+      BOOST_REQUIRE_EQUAL(call->arguments[i]->to_string(), expected[i]);
+    }
+  }
 }

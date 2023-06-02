@@ -17,6 +17,7 @@ Parser::Parser(lexer::Lexer *l) : l(l) {
   registerPrefix(lexer::TokenType::FALSE, &Parser::parseBoolean);
   registerPrefix(lexer::TokenType::LPAREN, &Parser::parseGroupedExpression);
   registerPrefix(lexer::TokenType::IF, &Parser::parseIfExpression);
+  registerPrefix(lexer::TokenType::FUNCTION, &Parser::parseFunctionLiteral);
 
   registerInfix(lexer::TokenType::PLUS, &Parser::parseInfixExpression);
   registerInfix(lexer::TokenType::MINUS, &Parser::parseInfixExpression);
@@ -26,6 +27,7 @@ Parser::Parser(lexer::Lexer *l) : l(l) {
   registerInfix(lexer::TokenType::NOT_EQ, &Parser::parseInfixExpression);
   registerInfix(lexer::TokenType::LT, &Parser::parseInfixExpression);
   registerInfix(lexer::TokenType::GT, &Parser::parseInfixExpression);
+  registerInfix(lexer::TokenType::LPAREN, &Parser::parseCallExpression);
 }
 
 void Parser::nextToken() {
@@ -203,6 +205,66 @@ Expression Parser::parseGroupedExpression() {
     return nullptr;
   }
   return exp;
+}
+
+ast::Parameters Parser::parseFunctionParameters(){
+    ast::Parameters parameters;
+    if (peekTokenIs(lexer::TokenType::RPAREN)) {
+        nextToken();
+        return parameters;
+    }
+    nextToken();
+    auto identifier = std::make_unique<ast::Identifier>(curToken);
+    parameters.push_back(std::move(identifier));
+    while (peekTokenIs(lexer::TokenType::COMMA)) {
+        nextToken();
+        nextToken();
+        auto identifier = std::make_unique<ast::Identifier>(curToken);
+        parameters.push_back(std::move(identifier));
+    }
+    if (!expectPeek(lexer::TokenType::RPAREN)) {
+        return {};
+    }
+    return parameters;
+}
+
+Expression Parser::parseFunctionLiteral(){
+    auto functionLiteral = std::make_unique<ast::FunctionLiteral>(curToken);
+    if (!expectPeek(lexer::TokenType::LPAREN)) {
+        return nullptr;
+    }
+    functionLiteral->parameters = parseFunctionParameters();
+    if (!expectPeek(lexer::TokenType::LBRACE)) {
+        return nullptr;
+    }
+    functionLiteral->body = parseBlockStatement();
+    return functionLiteral;
+}
+
+Expression Parser::parseCallExpression(Expression function){
+    auto expression = std::make_unique<ast::CallExpression>(curToken);
+    expression->function = std::move(function);
+    expression->arguments = parseCallArguments();
+    return expression;
+}
+
+ast::Arguments Parser::parseCallArguments(){
+    ast::Arguments arguments;
+    if (peekTokenIs(lexer::TokenType::RPAREN)) {
+        nextToken();
+        return arguments;
+    }
+    nextToken();
+    arguments.push_back(parseExpression(Precedence::LOWEST));
+    while (peekTokenIs(lexer::TokenType::COMMA)) {
+        nextToken();
+        nextToken();
+        arguments.push_back(parseExpression(Precedence::LOWEST));
+    }
+    if (!expectPeek(lexer::TokenType::RPAREN)) {
+        return {};
+    }
+    return arguments;
 }
 
 bool Parser::curTokenIs(lexer::TokenType type) { return curToken.type == type; }

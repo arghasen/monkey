@@ -9,6 +9,11 @@ namespace monkey {
 namespace parser {
 namespace ast {
 
+class Identifier;
+class Expression;
+using Parameters = std::vector<std::unique_ptr<Identifier>>;
+using Arguments = std::vector<std::unique_ptr<Expression>>;
+
 class Node {
 public:
   virtual ~Node() = default;
@@ -131,6 +136,25 @@ public:
   std::unique_ptr<Expression> condition;
   std::unique_ptr<BlockStatement> consequence;
   std::unique_ptr<BlockStatement> alternative;
+};
+
+
+class FunctionLiteral : public Expression {
+public:
+  explicit FunctionLiteral(lexer::Token tok);
+  ~FunctionLiteral() override = default;
+  std::string to_string() const override;
+  Parameters parameters;
+  std::unique_ptr<BlockStatement> body;
+};
+
+class CallExpression : public Expression {
+public:
+  explicit CallExpression(lexer::Token tok);
+  ~CallExpression() override = default;
+  std::string to_string() const override;
+  std::unique_ptr<Expression> function;
+  Arguments arguments;
 };
 
 template<typename Y>

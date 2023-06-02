@@ -38,6 +38,7 @@ const std::unordered_map<lexer::TokenType, Precedence> precedences = {
     {lexer::TokenType::MINUS, Precedence::SUM},
     {lexer::TokenType::SLASH, Precedence::PRODUCT},
     {lexer::TokenType::ASTERISK, Precedence::PRODUCT},
+    {lexer::TokenType::LPAREN, Precedence::CALL},
 };
 
 class Parser {
@@ -54,6 +55,8 @@ private:
   std::unique_ptr<ast::LetStatement> parseLetStatement();
   std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
   std::unique_ptr<ast::ExpressionStatement> parseExpressionStatement();
+  std::unique_ptr<ast::BlockStatement> parseBlockStatement();
+  
   Expression parseExpression(Precedence precedence);
   Expression parseIdentifier();
   Expression parseIntegerLiteral();
@@ -62,7 +65,10 @@ private:
   Expression parseBoolean();
   Expression parseGroupedExpression();
   Expression parseIfExpression();
-  std::unique_ptr<ast::BlockStatement> parseBlockStatement();
+  Expression parseFunctionLiteral();
+  ast::Parameters parseFunctionParameters();
+  Expression parseCallExpression(Expression function);
+  ast::Arguments parseCallArguments();
 
   void noPrefixParseFnError(lexer::TokenType type);
 
