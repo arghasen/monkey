@@ -1,0 +1,43 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.4.1
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        boost_version: 1.81.0
+        # OPTIONAL: Specify a toolset
+        toolset: gcc
+    - name: Set up C++ toolchain
+      run: sudo apt-get install -y lcov
+    - name: Set up CMake
+      # using 'latest' branch, the most recent CMake and ninja are installed.
+      uses: lukka/get-cmake@latest  
+    - name: Configure
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/bin/g++-12
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+    - name: Build
+      run: cmake --build build --config Debug
+    - name: Run Tests
+      run: cd build && ctest -V
+    - name: Generate Coverage Report
+      run: |
+        lcov --directory . --capture --output-file coverage.info --gcov-tool /usr/bin/gcov-12
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --list coverage.info
+    - name: Upload Coverage Report
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

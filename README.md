@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/arghasen/monkey/branch/master/graph/badge.svg?token=Z1DYGCI7LL)](https://codecov.io/gh/arghasen/monkey)
+
 # Monkey Interpreter
 An implementation of the Monkey Programming Language interpreter in C++.
 
