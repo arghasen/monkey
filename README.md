@@ -15,3 +15,7 @@ A basic lexer which supports the following features
 
 ## Parser (WIP)
 AST based parser
+### Statements
+- Let Statements
+- Return Statements
+### Expressions
