@@ -4,6 +4,11 @@ project(MonkeyInterpreter)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Enable code coverage
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+endif()
+
 # Find Boost libraries
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
@@ -14,6 +19,11 @@ add_library(MonkeyInterpreter STATIC
     parser/ast.cpp
     parser/parser.cpp
 )
+
+# Link the MonkeyInterpreter target with gcov
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(MonkeyInterpreter gcov)
+endif()
 
 # Find Git
 find_package(Git)

@@ -1,0 +1,23 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up CMake
+      run: sudo apt-get install -y cmake
+    - name: Build
+      run: cmake --build . --config Release
+    - name: Run Tests
+      uses: ./.github/workflows/test.yml
+    # - name: Upload Coverage Report
+    #   uses: codecov/codecov-action@v1
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
