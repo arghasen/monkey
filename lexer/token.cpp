@@ -20,38 +20,70 @@ TokenType LookupIdent(const std::string &ident) {
   }
 }
 
+std::string to_string(TokenType tok) {
+  switch (tok) {
+  case TokenType::ILLEGAL:
+    return "ILLEGAL";
+  case TokenType::EOFILE:
+    return "EOFILE";
+  case TokenType::IDENT:
+    return "IDENT";
+  case TokenType::INT:
+    return "INT";
+  case TokenType::ASSIGN:
+    return "ASSIGN";
+  case TokenType::PLUS:
+    return "PLUS";
+  case TokenType::MINUS:
+    return "MINUS";
+  case TokenType::BANG:
+    return "BANG";
+  case TokenType::ASTERISK:
+    return "ASTERISK";
+  case TokenType::SLASH:
+    return "SLASH";
+  case TokenType::LT:
+    return "LT";
+  case TokenType::GT:
+    return "GT";
+  case TokenType::EQ:
+    return "EQ";
+  case TokenType::NOT_EQ:
+    return "NOT_EQ";
+  case TokenType::COMMA:
+    return "COMMA";
+  case TokenType::SEMICOLON:
+    return "SEMICOLON";
+  case TokenType::LPAREN:
+    return "LPAREN";
+  case TokenType::RPAREN:
+    return "RPAREN";
+  case TokenType::LBRACE:
+    return "LBRACE";
+  case TokenType::RBRACE:
+    return "RBRACE";
+  case TokenType::FUNCTION:
+    return "FUNCTION";
+  case TokenType::LET:
+    return "LET";
+  case TokenType::TRUE:
+    return "TRUE";
+  case TokenType::FALSE:
+    return "FALSE";
+  case TokenType::IF:
+    return "IF";
+  case TokenType::ELSE:
+    return "ELSE";
+  case TokenType::RETURN:
+    return "RETURN";
+  default:
+    return "";
+  }
+}
+
 std::ostream &operator<<(std::ostream &os, TokenType tok ){
 
-  switch(tok){
-    case TokenType::ILLEGAL: os << "ILLEGAL";break;
-    case TokenType::EOFILE: os << "EOFILE";break;
-    case TokenType::IDENT: os << "IDENT";break;
-    case TokenType::INT: os << "INT";break;
-    case TokenType::ASSIGN: os << "ASSIGN";break;
-    case TokenType::PLUS: os << "PLUS";break;
-    case TokenType::MINUS: os << "MINUS";break;
-    case TokenType::BANG: os << "BANG";break;
-    case TokenType::ASTERISK: os << "ASTERISK";break;
-    case TokenType::SLASH: os << "SLASH";break;
-    case TokenType::LT: os << "LT";break;
-    case TokenType::GT: os << "GT";break;
-    case TokenType::EQ: os << "EQ";break;
-    case TokenType::NOT_EQ: os << "NOT_EQ";break;
-    case TokenType::COMMA: os << "COMMA";break;
-    case TokenType::SEMICOLON: os << "SEMICOLON";break;
-    case TokenType::LPAREN: os << "LPAREN";break;
-    case TokenType::RPAREN: os << "RPAREN";break;
-    case TokenType::LBRACE: os << "LBRACE";break;
-    case TokenType::RBRACE: os << "RBRACE";break;
-    case TokenType::FUNCTION: os << "FUNCTION";break;
-    case TokenType::LET: os << "LET";break;
-    case TokenType::TRUE: os << "TRUE";break;
-    case TokenType::FALSE: os << "FALSE";break;
-    case TokenType::IF: os << "IF";break;
-    case TokenType::ELSE: os << "ELSE";break;
-    case TokenType::RETURN: os << "RETURN";break;
-    default: os << "UNKNOWN";break;
-  }
+  os << to_string(tok);
   return os;
 }
 
