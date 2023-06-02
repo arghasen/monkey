@@ -47,10 +47,18 @@ BOOST_AUTO_TEST_CASE(TestLetStatements) {
   checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 3);
-  std::vector expectedIdentifiers = {"x", "y", "foobar"};
-  for(auto counter=0; auto expectedIdentifier : expectedIdentifiers){
+  std::vector<std::pair<std::string, std::string>> expectedIdentifiers = {
+    {"x", "5"},
+    {"y", "10"},
+    {"foobar", "838383"}
+  };
+  for(auto counter=0; auto [expectedIdentifier, expectedValue] : expectedIdentifiers){
       auto stmt = program->statements[counter].get();
       testLetStatement(stmt, expectedIdentifier);
+      auto expr = getAs<LetStatement>(stmt);
+      auto literal = getAs<IntegerLiteral>(expr->value.get());
+      BOOST_REQUIRE_EQUAL(literal->value, std::stoi(expectedValue));
+      BOOST_REQUIRE_EQUAL(literal->TokenLiteral(), expectedValue); 
       counter++;
   }
 }
@@ -84,10 +92,18 @@ BOOST_AUTO_TEST_CASE(TestReturnStatements){
   checkParserErrors(p);
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(program->statements.size(), 3);
-
-  for(auto& stmt : program->statements){
+  std::vector<std::string> expectedValues = {
+    "5",
+    "10",
+    "993322"
+  };
+  for(auto counter =0;auto& stmt : program->statements){
     auto returnStmt = getAs<ReturnStatement>(stmt.get());
     BOOST_REQUIRE_EQUAL(returnStmt->TokenLiteral(), "return");
+    auto literal = getAs<IntegerLiteral>(returnStmt->returnValue.get());
+    BOOST_REQUIRE_EQUAL(literal->value, std::stoi(expectedValues[counter]));
+    BOOST_REQUIRE_EQUAL(literal->TokenLiteral(), expectedValues[counter]); 
+    counter++;
   }
 }
 
