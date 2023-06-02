@@ -58,6 +58,7 @@ private:
   Expression parseIntegerLiteral();
   Expression parsePrefixExpression();
   Expression parseInfixExpression(Expression left);
+  Expression parseBoolean();
 
   void noPrefixParseFnError(lexer::TokenType type);
   

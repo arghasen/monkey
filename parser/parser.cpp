@@ -13,6 +13,8 @@ Parser::Parser(lexer::Lexer* l) : l(l) {
     registerPrefix(lexer::TokenType::INT, &Parser::parseIntegerLiteral);
     registerPrefix(lexer::TokenType::BANG, &Parser::parsePrefixExpression);
     registerPrefix(lexer::TokenType::MINUS, &Parser::parsePrefixExpression);
+    registerPrefix(lexer::TokenType::TRUE, &Parser::parseBoolean);
+    registerPrefix(lexer::TokenType::FALSE, &Parser::parseBoolean);
     registerInfix(lexer::TokenType::PLUS, &Parser::parseInfixExpression);
     registerInfix(lexer::TokenType::MINUS, &Parser::parseInfixExpression);
     registerInfix(lexer::TokenType::SLASH, &Parser::parseInfixExpression);
@@ -144,6 +146,10 @@ Expression Parser::parseInfixExpression(Expression left){
     nextToken();
     expression->right = parseExpression(precedence);
     return expression;
+}
+
+Expression Parser::parseBoolean(){
+    return std::make_unique<ast::Boolean>(curToken, curTokenIs(lexer::TokenType::TRUE));
 }
 
 bool Parser::curTokenIs(lexer::TokenType type){

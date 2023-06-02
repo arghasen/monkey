@@ -36,7 +36,7 @@ PrefixExpression::PrefixExpression(lexer::Token tok)
 InfixExpression::InfixExpression(lexer::Token tok)
     : Expression(tok), left(nullptr), op(tok.literal), right(nullptr) {}
 
-Boolean::Boolean(lexer::Token tok) : Expression(tok) {}
+Boolean::Boolean(lexer::Token tok, bool val) : Expression(tok), value(val) {}
 
 std::string Expression::to_string() const { return token.literal; }
 
