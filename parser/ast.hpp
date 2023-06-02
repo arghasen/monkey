@@ -45,7 +45,7 @@ public:
   explicit Identifier(lexer::Token tok);
   ~Identifier() override = default;
   std::string TokenLiteral() const override;
-    std::string to_string() const override;
+  std::string to_string() const override;
   lexer::Token token;
   std::string value;
 };

@@ -8,6 +8,7 @@ namespace parser{
 Parser::Parser(lexer::Lexer* l) : l(l) {
     nextToken();
     nextToken();
+    registerPrefix(lexer::TokenType::IDENT, &Parser::parseIdentifier);
 }
 
 void Parser::nextToken() {
@@ -36,7 +37,7 @@ std::unique_ptr<ast::Statement> Parser::parseStatement(){
         case lexer::TokenType::RETURN:
             return parseReturnStatement();
         default:
-            return nullptr;
+            return parseExpressionStatement();
     }
     return nullptr;
 }
@@ -67,6 +68,28 @@ std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement(){
     return returnStatement;
 }
 
+std::unique_ptr<ast::ExpressionStatement> Parser::parseExpressionStatement(){
+    auto expressionStatement = std::make_unique<ast::ExpressionStatement>(curToken);
+    expressionStatement->expression = parseExpression(Precedence::LOWEST);
+    if(peekTokenIs(lexer::TokenType::SEMICOLON)){
+        nextToken();
+    }
+    return expressionStatement;
+}
+
+std::unique_ptr<ast::Expression> Parser::parseExpression(Precedence precedence){
+    auto prefix = prefixParseFns[curToken.type];
+    if(prefix == nullptr){
+        return nullptr;
+    }
+    auto leftExp = prefix();
+    return leftExp;
+}
+
+std::unique_ptr<ast::Expression> Parser::parseIdentifier(){
+    return std::make_unique<ast::Identifier>(curToken);
+}
+
 bool Parser::curTokenIs(lexer::TokenType type){
     return curToken.type == type;
 }
@@ -94,6 +117,13 @@ void Parser::peekError(lexer::TokenType type){
     errors.push_back(msg);
 }
 
+void Parser::registerPrefix(lexer::TokenType type, auto fn){
+    prefixParseFns[type] = std::bind(fn, this);
+}
+
+void Parser::registerInfix(lexer::TokenType type, auto fn){
+    infixParseFns[type] = std::bind(fn, this);
+}
 
 } // namespace parser
 } // namespace monkey
