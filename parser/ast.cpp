@@ -14,10 +14,15 @@ std::string Program::TokenLiteral() const {
 std::string Identifier::TokenLiteral() const { return token.literal; }
 std::string LetStatement::TokenLiteral() const { return token.literal; }
 std::string ReturnStatement::TokenLiteral() const { return token.literal; }
+std::string ExpressionStatement::TokenLiteral() const {
+    return token.literal;
+}
 
 LetStatement::LetStatement(lexer::Token tok) : token(tok) {}
 Identifier::Identifier(lexer::Token tok) : token(tok), value(tok.literal) {}
 ReturnStatement::ReturnStatement(lexer::Token tok) : token(tok) {}
+ExpressionStatement::ExpressionStatement(lexer::Token tok)
+    : token(tok), expression(nullptr) {}
 
 std::string Program::to_string() const {
   std::string out;

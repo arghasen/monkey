@@ -4,13 +4,18 @@
 using namespace monkey::parser;
 using namespace monkey::parser::ast;
 
-void testLetStatement(Statement* s, std::string name){
-
-  BOOST_REQUIRE_EQUAL(s->TokenLiteral(), "let");
-  auto letStmt = dynamic_cast<LetStatement*>(s);
-  if(letStmt == nullptr){
-    BOOST_FAIL("s not *LetStatement. Got " + std::string(typeid(s).name()));
+template<typename T, typename Y>
+T* getAs(Y* s){
+  auto stmt = dynamic_cast<T*>(s);
+  if(stmt == nullptr){
+    BOOST_FAIL("s not *T. Got " + std::string(typeid(s).name()));
   }
+  return stmt;
+}
+
+void testLetStatement(Statement* s, std::string name){
+  BOOST_REQUIRE_EQUAL(s->TokenLiteral(), "let");
+  auto letStmt = getAs<LetStatement>(s);
   BOOST_REQUIRE_EQUAL(letStmt->name->value, name);
   BOOST_REQUIRE_EQUAL(letStmt->name->TokenLiteral(), name);
 }
@@ -80,10 +85,21 @@ BOOST_AUTO_TEST_CASE(TestReturnStatements){
   checkParserErrors(p);
 
   for(auto& stmt : program->statements){
-    auto returnStmt = dynamic_cast<ReturnStatement*>(stmt.get());
-    if(returnStmt == nullptr){
-      BOOST_FAIL("stmt not *ReturnStatement. Got " + std::string(typeid(stmt).name()));
-    }
+    auto returnStmt = getAs<ReturnStatement>(stmt.get());
     BOOST_REQUIRE_EQUAL(returnStmt->TokenLiteral(), "return");
   }
+}
+
+BOOST_AUTO_TEST_CASE(TestIdentifierExpression){
+  auto input = "foobar;";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  checkParserErrors(p);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto ident = getAs<Identifier>(exprStmt->expression.get());
+  BOOST_REQUIRE_EQUAL(ident->TokenLiteral(), "foobar");
 }
