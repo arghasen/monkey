@@ -135,6 +135,8 @@ BOOST_AUTO_TEST_CASE(TestParsingPrefixExpressions){
   std::vector<std::pair<std::string,std::string>> tests = {
     {"!", "5"},
     {"-", "15"}
+        //     {"!true;", "!", true},
+        // {"!false;", "!", false},
   };
   for(auto counter=0; auto test : tests){
     auto stmt = program->statements[counter].get();
@@ -180,17 +182,17 @@ BOOST_AUTO_TEST_CASE(TestParsingInfixExpressions){
     checkParserErrors(p);
     BOOST_REQUIRE_NE(program, nullptr);
     BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
-      auto stmt = program->statements[0].get();
-      auto exprStmt = getAs<ExpressionStatement>(stmt);
-      auto infixExpr = getAs<InfixExpression>(exprStmt->expression.get());
-      BOOST_REQUIRE_EQUAL(infixExpr->op, expectedOp);
-      BOOST_REQUIRE_EQUAL(infixExpr->TokenLiteral(), expectedOp);
-      auto left = getAs<IntegerLiteral>(infixExpr->left.get());
-      BOOST_REQUIRE_EQUAL(left->value,std::stoi(expectedLeft));
-      BOOST_REQUIRE_EQUAL(left->TokenLiteral(), expectedLeft);
-      auto right = getAs<IntegerLiteral>(infixExpr->right.get());
-      BOOST_REQUIRE_EQUAL(right->value, std::stoi(expectedRight));
-      BOOST_REQUIRE_EQUAL(right->TokenLiteral(), expectedRight);
+    auto stmt = program->statements[0].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto infixExpr = getAs<InfixExpression>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(infixExpr->op, expectedOp);
+    BOOST_REQUIRE_EQUAL(infixExpr->TokenLiteral(), expectedOp);
+    auto left = getAs<IntegerLiteral>(infixExpr->left.get());
+    BOOST_REQUIRE_EQUAL(left->value,std::stoi(expectedLeft));
+    BOOST_REQUIRE_EQUAL(left->TokenLiteral(), expectedLeft);
+    auto right = getAs<IntegerLiteral>(infixExpr->right.get());
+    BOOST_REQUIRE_EQUAL(right->value, std::stoi(expectedRight));
+    BOOST_REQUIRE_EQUAL(right->TokenLiteral(), expectedRight);
   }
 
 }
@@ -210,33 +212,15 @@ BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing){
     {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
     {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
     { "true","true", },
-		{"false","false",},
-		{ "3 > 5 == false", "((3 > 5) == false)", },
-		{ "3 < 5 == true", "((3 < 5) == true)", },
-		// {
-		// 	"1 + (2 + 3) + 4",
-		// 	"((1 + (2 + 3)) + 4)",
-		// },
-		// {
-		// 	"(5 + 5) * 2",
-		// 	"((5 + 5) * 2)",
-		// },
-		// {
-		// 	"2 / (5 + 5)",
-		// 	"(2 / (5 + 5))",
-		// },
-		// {
-		// 	"(5 + 5) * 2 * (5 + 5)",
-		// 	"(((5 + 5) * 2) * (5 + 5))",
-		// },
-		// {
-		// 	"-(5 + 5)",
-		// 	"(-(5 + 5))",
-		// },
-		// {
-		// 	"!(true == true)",
-		// 	"(!(true == true))",
-		// },
+    {"false","false",},
+    { "3 > 5 == false", "((3 > 5) == false)", },
+    { "3 < 5 == true", "((3 < 5) == true)", },
+    { "1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)", },
+    { "(5 + 5) * 2", "((5 + 5) * 2)", },
+    { "2 / (5 + 5)", "(2 / (5 + 5))", },
+    { "(5 + 5) * 2 * (5 + 5)", "(((5 + 5) * 2) * (5 + 5))", },
+    { "-(5 + 5)", "(-(5 + 5))", },
+    { "!(true == true)", "(!(true == true))", },
 		// {
 		// 	"a + add(b * c) + d",
 		// 	"((a + add((b * c))) + d)",
@@ -281,4 +265,51 @@ BOOST_AUTO_TEST_CASE(TestBooleanParsing){
     BOOST_REQUIRE_EQUAL(boolean->value, expected);
     BOOST_REQUIRE_EQUAL(boolean->TokenLiteral(), expected ? "true" : "false");
   }
+}
+
+BOOST_AUTO_TEST_CASE(TestIfExpression){
+  std::string input = "if (x < y) { x }";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto ifExpr = getAs<IfExpression>(exprStmt->expression.get());
+  auto condition = getAs<InfixExpression>(ifExpr->condition.get());
+  BOOST_REQUIRE_EQUAL(condition->left->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(condition->op, "<");
+  BOOST_REQUIRE_EQUAL(condition->right->TokenLiteral(), "y");
+  BOOST_REQUIRE_EQUAL(ifExpr->consequence->statements.size(), 1);
+  auto consequence = ifExpr->consequence->statements[0].get();
+  auto consequenceExpr = getAs<ExpressionStatement>(consequence);
+  BOOST_REQUIRE_EQUAL(consequenceExpr->expression->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(ifExpr->alternative, nullptr);
+}
+
+BOOST_AUTO_TEST_CASE(TestIfElseExpression){
+  std::string input = "if (x < y) { x } else { y }";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto ifExpr = getAs<IfExpression>(exprStmt->expression.get());
+  auto condition = getAs<InfixExpression>(ifExpr->condition.get());
+  BOOST_REQUIRE_EQUAL(condition->left->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(condition->op, "<");
+  BOOST_REQUIRE_EQUAL(condition->right->TokenLiteral(), "y");
+  BOOST_REQUIRE_EQUAL(ifExpr->consequence->statements.size(), 1);
+  auto consequence = ifExpr->consequence->statements[0].get();
+  auto consequenceExpr = getAs<ExpressionStatement>(consequence);
+  BOOST_REQUIRE_EQUAL(consequenceExpr->expression->TokenLiteral(), "x");
+  BOOST_REQUIRE_EQUAL(ifExpr->alternative->statements.size(), 1);
+  auto alternative = ifExpr->alternative->statements[0].get();
+  auto alternativeExpr = getAs<ExpressionStatement>(alternative);
+  BOOST_REQUIRE_EQUAL(alternativeExpr->expression->TokenLiteral(), "y");
 }

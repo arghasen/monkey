@@ -115,6 +115,24 @@ public:
   bool value;
 };
 
+class BlockStatement : public Statement {
+public:
+  explicit BlockStatement(lexer::Token tok);
+  ~BlockStatement() override = default;
+  std::string to_string() const override;
+  std::vector<std::unique_ptr<Statement>> statements;
+};
+
+class IfExpression : public Expression {
+public:
+  explicit IfExpression(lexer::Token tok);
+  ~IfExpression() override = default;
+  std::string to_string() const override;
+  std::unique_ptr<Expression> condition;
+  std::unique_ptr<BlockStatement> consequence;
+  std::unique_ptr<BlockStatement> alternative;
+};
+
 template<typename Y>
 concept AstNode = std::is_same<Y, Statement>::value || std::is_same<Y, ast::Expression>::value;
 
