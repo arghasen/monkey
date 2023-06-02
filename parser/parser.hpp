@@ -15,6 +15,8 @@ class Parser;
 using PrefixParseFn = std::function<std::unique_ptr<ast::Expression>()>;
 using InfixParseFn = std::function<std::unique_ptr<ast::Expression>(
                                                                    std::unique_ptr<ast::Expression>)>;
+using Expression = std::unique_ptr<ast::Expression>;
+using Errors = std::vector<std::string>;
 
 enum class Precedence{
   LOWEST,
@@ -27,6 +29,17 @@ enum class Precedence{
   INDEX // array[index]
 };
 
+const std::unordered_map<lexer::TokenType, Precedence> precedences = {
+  {lexer::TokenType::EQ, Precedence::EQUALS},
+  {lexer::TokenType::NOT_EQ, Precedence::EQUALS},
+  {lexer::TokenType::LT, Precedence::LESSGREATER},
+  {lexer::TokenType::GT, Precedence::LESSGREATER},
+  {lexer::TokenType::PLUS, Precedence::SUM},
+  {lexer::TokenType::MINUS, Precedence::SUM},
+  {lexer::TokenType::SLASH, Precedence::PRODUCT},
+  {lexer::TokenType::ASTERISK, Precedence::PRODUCT},
+};
+
 class Parser {
 public:
   explicit Parser(lexer::Lexer *l);
@@ -34,20 +47,25 @@ public:
 
   void nextToken();
   std::unique_ptr<ast::Program> parseProgram();
-  std::vector<std::string> getErrors() const;
+  Errors getErrors() const;
 
 private:
+
   std::unique_ptr<ast::Statement> parseStatement();
   std::unique_ptr<ast::LetStatement> parseLetStatement();
   std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
   std::unique_ptr<ast::ExpressionStatement> parseExpressionStatement();
-  std::unique_ptr<ast::Expression> parseExpression(Precedence precedence);
-  std::unique_ptr<ast::Expression> parseIdentifier();
-  std::unique_ptr<ast::Expression> parseIntegerLiteral();
-  std::unique_ptr<ast::Expression> parsePrefixExpression();
+  Expression parseExpression(Precedence precedence);
+  Expression parseIdentifier();
+  Expression parseIntegerLiteral();
+  Expression parsePrefixExpression();
+  Expression parseInfixExpression(Expression left);
 
   void noPrefixParseFnError(lexer::TokenType type);
   
+  Precedence peekPrecedence();
+  Precedence curPrecedence();
+
   bool expectPeek(lexer::TokenType type);
   bool curTokenIs(lexer::TokenType type);
   bool peekTokenIs(lexer::TokenType type);
@@ -58,7 +76,7 @@ private:
   lexer::Lexer *l;
   lexer::Token curToken;
   lexer::Token peekToken;
-  std::vector<std::string> errors;
+  Errors errors;
   std::unordered_map<lexer::TokenType, PrefixParseFn> prefixParseFns;
   std::unordered_map<lexer::TokenType, InfixParseFn> infixParseFns;
 

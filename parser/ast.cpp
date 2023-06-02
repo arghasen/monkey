@@ -23,6 +23,8 @@ std::string IntegerLiteral::TokenLiteral() const { return token.literal; }
 
 std::string PrefixExpression::TokenLiteral() const { return token.literal; }
 
+std::string InfixExpression::TokenLiteral() const { return token.literal; }
+
 LetStatement::LetStatement(lexer::Token tok) : token(tok) {}
 
 Identifier::Identifier(lexer::Token tok) : token(tok), value(tok.literal) {}
@@ -36,6 +38,9 @@ IntegerLiteral::IntegerLiteral(lexer::Token tok) : token(tok) {}
 
 PrefixExpression::PrefixExpression(lexer::Token tok)
     : token(tok), op(tok.literal), right(nullptr) {}
+
+InfixExpression::InfixExpression(lexer::Token tok)
+    : token(tok), left(nullptr), op(tok.literal), right(nullptr) {}
 
 std::string Program::to_string() const {
   std::string out;
@@ -75,6 +80,19 @@ std::string IntegerLiteral::to_string() const { return token.literal; }
 
 std::string PrefixExpression::to_string() const {
   std::string out = "(" + op;
+  if (right) {
+    out += right->to_string();
+  }
+  out += ")";
+  return out;
+}
+
+std::string InfixExpression::to_string() const {
+  std::string out = "(";
+  if (left) {
+    out += left->to_string();
+  }
+  out += " " + op + " ";
   if (right) {
     out += right->to_string();
   }

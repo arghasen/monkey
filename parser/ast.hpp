@@ -107,6 +107,24 @@ public:
   std::unique_ptr<Expression> right;
 };
 
+class InfixExpression : public Expression {
+public:
+  InfixExpression() = default;
+  InfixExpression(lexer::Token tok);
+  ~InfixExpression() override = default;
+  std::string TokenLiteral() const override;
+  std::string to_string() const override;
+  lexer::Token token;
+  std::unique_ptr<Expression> left;
+  std::string op;
+  std::unique_ptr<Expression> right;
+};
+
+template<typename Y>
+concept AstNode = std::is_same<Y, Statement>::value || std::is_same<Y, ast::Expression>::value;
+
+template<typename T>
+concept ExpressionNode = std::is_base_of<ast::Expression, T>::value;
 } // namespace ast
 } // namespace parser
 } // namespace monkey
