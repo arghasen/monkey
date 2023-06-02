@@ -13,8 +13,7 @@ namespace parser {
 class Parser;
 
 using PrefixParseFn = std::function<std::unique_ptr<ast::Expression>()>;
-using InfixParseFn = std::function<std::unique_ptr<ast::Expression>(
-                                                                   std::unique_ptr<ast::Expression>)>;
+using InfixParseFn = std::function<std::unique_ptr<ast::Expression>(std::unique_ptr<ast::Expression>)>;
 using Expression = std::unique_ptr<ast::Expression>;
 using Errors = std::vector<std::string>;
 
@@ -50,7 +49,6 @@ public:
   Errors getErrors() const;
 
 private:
-
   std::unique_ptr<ast::Statement> parseStatement();
   std::unique_ptr<ast::LetStatement> parseLetStatement();
   std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
@@ -81,8 +79,6 @@ private:
   std::unordered_map<lexer::TokenType, InfixParseFn> infixParseFns;
 
 };
-
-
 
 } // namespace parser
 } // namespace monkey

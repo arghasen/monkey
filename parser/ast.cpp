@@ -11,36 +11,34 @@ std::string Program::TokenLiteral() const {
   return statements[0]->TokenLiteral();
 }
 
-std::string Identifier::TokenLiteral() const { return token.literal; }
+std::string Statement::TokenLiteral() const { return token.literal; }
 
-std::string LetStatement::TokenLiteral() const { return token.literal; }
+std::string Expression::TokenLiteral() const { return token.literal; }
 
-std::string ReturnStatement::TokenLiteral() const { return token.literal; }
+Statement::Statement(lexer::Token tok) : token(tok) {}
 
-std::string ExpressionStatement::TokenLiteral() const {return token.literal; }
+Expression::Expression(lexer::Token tok) : token(tok) {}
 
-std::string IntegerLiteral::TokenLiteral() const { return token.literal; }
+LetStatement::LetStatement(lexer::Token tok) : Statement(tok) {}
 
-std::string PrefixExpression::TokenLiteral() const { return token.literal; }
+Identifier::Identifier(lexer::Token tok) : Expression(tok), value(tok.literal) {}
 
-std::string InfixExpression::TokenLiteral() const { return token.literal; }
-
-LetStatement::LetStatement(lexer::Token tok) : token(tok) {}
-
-Identifier::Identifier(lexer::Token tok) : token(tok), value(tok.literal) {}
-
-ReturnStatement::ReturnStatement(lexer::Token tok) : token(tok) {}
+ReturnStatement::ReturnStatement(lexer::Token tok) : Statement(tok) {}
 
 ExpressionStatement::ExpressionStatement(lexer::Token tok)
-    : token(tok), expression(nullptr) {}
+    : Statement(tok), expression(nullptr) {}
 
-IntegerLiteral::IntegerLiteral(lexer::Token tok) : token(tok) {}
+IntegerLiteral::IntegerLiteral(lexer::Token tok) : Expression(tok) {}
 
 PrefixExpression::PrefixExpression(lexer::Token tok)
-    : token(tok), op(tok.literal), right(nullptr) {}
+    : Expression(tok), op(tok.literal), right(nullptr) {}
 
 InfixExpression::InfixExpression(lexer::Token tok)
-    : token(tok), left(nullptr), op(tok.literal), right(nullptr) {}
+    : Expression(tok), left(nullptr), op(tok.literal), right(nullptr) {}
+
+Boolean::Boolean(lexer::Token tok) : Expression(tok) {}
+
+std::string Expression::to_string() const { return token.literal; }
 
 std::string Program::to_string() const {
   std::string out;
@@ -75,8 +73,6 @@ std::string ExpressionStatement::to_string() const {
   }
   return "";
 }
-
-std::string IntegerLiteral::to_string() const { return token.literal; }
 
 std::string PrefixExpression::to_string() const {
   std::string out = "(" + op;
