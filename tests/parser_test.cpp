@@ -63,3 +63,27 @@ BOOST_AUTO_TEST_CASE(TestLetStatementsFailures) {
   BOOST_REQUIRE_NE(program, nullptr);
   BOOST_REQUIRE_EQUAL(p.getErrors().size(), 3);
 }
+
+BOOST_AUTO_TEST_CASE(TestReturnStatements){
+  auto input = R"(
+    return 5;
+    return 10;
+    return 993322;
+  )";
+
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+
+  auto program = p.parseProgram();
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 3);
+  checkParserErrors(p);
+
+  for(auto& stmt : program->statements){
+    auto returnStmt = dynamic_cast<ReturnStatement*>(stmt.get());
+    if(returnStmt == nullptr){
+      BOOST_FAIL("stmt not *ReturnStatement. Got " + std::string(typeid(stmt).name()));
+    }
+    BOOST_REQUIRE_EQUAL(returnStmt->TokenLiteral(), "return");
+  }
+}

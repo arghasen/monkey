@@ -56,6 +56,16 @@ public:
   std::unique_ptr<Expression> value;
 };
 
+class ReturnStatement : public Statement {
+public:
+  ReturnStatement() = default;
+  explicit ReturnStatement(lexer::Token tok);
+  ~ReturnStatement() override = default;
+  std::string TokenLiteral() const override;
+  lexer::Token token;
+  std::unique_ptr<Expression> returnValue;
+};
+
 } // namespace ast
 } // namespace parser
 } // namespace monkey

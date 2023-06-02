@@ -33,6 +33,8 @@ std::unique_ptr<ast::Statement> Parser::parseStatement(){
     switch(curToken.type){
         case lexer::TokenType::LET:
             return parseLetStatement();
+        case lexer::TokenType::RETURN:
+            return parseReturnStatement();
         default:
             return nullptr;
     }
@@ -53,6 +55,16 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement(){
         nextToken();
     }
     return letstatement;
+}
+
+std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement(){
+    auto returnStatement = std::make_unique<ast::ReturnStatement>(curToken);
+    nextToken();
+    // Todo: We're skipping the expressions until we encounter a semicolon
+    while(not curTokenIs(lexer::TokenType::SEMICOLON)){
+        nextToken();
+    }
+    return returnStatement;
 }
 
 bool Parser::curTokenIs(lexer::TokenType type){
@@ -81,5 +93,7 @@ void Parser::peekError(lexer::TokenType type){
     std::string msg = "expected next token to be " + lexer::to_string(type) + " got " + lexer::to_string(peekToken.type) + " instead";
     errors.push_back(msg);
 }
+
+
 } // namespace parser
 } // namespace monkey

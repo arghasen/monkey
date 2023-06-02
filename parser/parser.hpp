@@ -21,10 +21,11 @@ public:
 private:
   std::unique_ptr<ast::Statement> parseStatement();
   std::unique_ptr<ast::LetStatement> parseLetStatement();
+  std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
   bool expectPeek(lexer::TokenType type);
-bool curTokenIs(lexer::TokenType type);
-bool peekTokenIs(lexer::TokenType type);
-void peekError(lexer::TokenType type);
+  bool curTokenIs(lexer::TokenType type);
+  bool peekTokenIs(lexer::TokenType type);
+  void peekError(lexer::TokenType type);
 
   lexer::Lexer *l;
   lexer::Token curToken;
