@@ -57,6 +57,7 @@ struct Token {
 
 TokenType LookupIdent(const std::string &ident);
 
+std::string to_string(TokenType tok);
 std::ostream &operator<<(std::ostream &os, const Token &tok);
 std::ostream &operator<<(std::ostream &os, TokenType tok);
 
