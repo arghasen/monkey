@@ -103,3 +103,17 @@ BOOST_AUTO_TEST_CASE(TestIdentifierExpression){
   auto ident = getAs<Identifier>(exprStmt->expression.get());
   BOOST_REQUIRE_EQUAL(ident->TokenLiteral(), "foobar");
 }
+
+BOOST_AUTO_TEST_CASE(TestIntegerLiteralExpression){
+  auto input = "5;";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  checkParserErrors(p);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto literal = getAs<IntegerLiteral>(exprStmt->expression.get());
+  BOOST_REQUIRE_EQUAL(literal->TokenLiteral(), "5");
+}

@@ -84,6 +84,17 @@ public:
   std::unique_ptr<Expression> expression;
 };
 
+class IntegerLiteral : public Expression {
+public:
+  IntegerLiteral() = default;
+  explicit IntegerLiteral(lexer::Token tok);
+  ~IntegerLiteral() override = default;
+  std::string TokenLiteral() const override;
+  std::string to_string() const override;
+  lexer::Token token;
+  int64_t value;
+};
+
 } // namespace ast
 } // namespace parser
 } // namespace monkey

@@ -6,9 +6,11 @@ namespace monkey{
 namespace parser{
 
 Parser::Parser(lexer::Lexer* l) : l(l) {
-    nextToken();
-    nextToken();
+    nextToken(); // set curToken
+    nextToken(); // set peekToken
+
     registerPrefix(lexer::TokenType::IDENT, &Parser::parseIdentifier);
+    registerPrefix(lexer::TokenType::INT, &Parser::parseIntegerLiteral);
 }
 
 void Parser::nextToken() {
@@ -17,7 +19,6 @@ void Parser::nextToken() {
 }
 
 std::unique_ptr<ast::Program> Parser::parseProgram() {
-
     auto program = std::make_unique<ast::Program>();
 
     while (not curTokenIs(lexer::TokenType::EOFILE)) {
@@ -88,6 +89,20 @@ std::unique_ptr<ast::Expression> Parser::parseExpression(Precedence precedence){
 
 std::unique_ptr<ast::Expression> Parser::parseIdentifier(){
     return std::make_unique<ast::Identifier>(curToken);
+}
+
+std::unique_ptr<ast::Expression> Parser::parseIntegerLiteral(){
+    auto literal = std::make_unique<ast::IntegerLiteral>(curToken);
+    int value = 0;
+    try{
+        value = std::stoi(curToken.literal);
+    }catch(std::invalid_argument& e){
+        std::string msg = "could not parse " + curToken.literal + " as integer";
+        errors.push_back(msg);
+        return nullptr;
+    }
+    literal->value = value;
+    return literal;
 }
 
 bool Parser::curTokenIs(lexer::TokenType type){

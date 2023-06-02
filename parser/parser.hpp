@@ -43,6 +43,7 @@ private:
   std::unique_ptr<ast::ExpressionStatement> parseExpressionStatement();
   std::unique_ptr<ast::Expression> parseExpression(Precedence precedence);
   std::unique_ptr<ast::Expression> parseIdentifier();
+  std::unique_ptr<ast::Expression> parseIntegerLiteral();
   
   bool expectPeek(lexer::TokenType type);
   bool curTokenIs(lexer::TokenType type);
