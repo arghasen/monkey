@@ -1,11 +1,33 @@
 #include "lexer/lexer.hpp"
 #include "lexer/token.hpp"
+#include "parser/parser.hpp"
 
 #include <iostream>
 #include <version.hpp>
 
 constexpr auto PROMPT = ">> ";
+const auto MonkeyFace = R"(
+            __,__
+   .--.  .-"     "-.  .--.
+  / .. \/  .-. .-.  \/ .. \
+ | |  '|  /   Y   \  |'  | |
+ | \   \  \ 0 | 0 /  /   / |
+  \ '- ,\.-"""""""-./, -' /
+   ''-' /_   ^ ^   _\ '-''
+       |  \._   _./  |
+       \   \ '~' /   /
+        '._ '-=-' _.'
+           '-----'
+)";
 
+void printParserErrors(const std::vector<std::string> &errors) {
+  std::cout << MonkeyFace << std::endl;
+  std::cout << "Woops! We ran into some monkey business here!" << std::endl;
+  std::cout << " parser errors:" << std::endl;
+  for (const auto &err : errors) {
+    std::cout << "\t" << err << std::endl;
+  }
+}
 int main() {
   std::cout << "Hello, Monkey! version : " << VERSION << std::endl;
   std::cout << "Feel free to type in commands" << std::endl;
@@ -18,10 +40,13 @@ int main() {
     }
     std::cout << input << std::endl;
     monkey::lexer::Lexer l(input);
-    for (auto tok = l.nextToken(); tok.type != monkey::lexer::TokenType::EOFILE;
-         tok = l.nextToken()) {
-      std::cout << tok << std::endl;
+    monkey::parser::Parser p(&l);
+    auto program = p.parseProgram();
+    if(p.getErrors().size() != 0){
+      printParserErrors(p.getErrors());
+      continue;
     }
+    std::cout << program->to_string() << std::endl;
   }
   return 0;
 }
