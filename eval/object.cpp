@@ -33,9 +33,9 @@ Error::Error(std::string message) : message_(std::move(message)) {}
 Environment::StoreData Environment::get(const std::string &name) {
   auto it = store_.find(name);
   if (it != store_.end()) {
-    return {it->second, true};
+    return StoreData{.value =it->second, .found =true};
   }
-  return StoreData{nullptr, false};
+  return StoreData{.value = nullptr, .found = false};
 }
 
 void Environment::set(const std::string &name, ObjectPtr value) {
