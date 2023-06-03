@@ -60,6 +60,7 @@ add_executable(MonkeyInterpreterTest ${TESTS_SRC})
 # Link the Monkey Interpreter test executable with Boost libraries
 target_link_libraries(MonkeyInterpreterTest MonkeyInterpreter ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
+#add_test(NAME MonkeyInterpreterTest COMMAND MonkeyInterpreterTest)
 # Add all the ADD_TEST for each test
 foreach (TEST_SRC ${TESTS_SRC})
   get_filename_component (SRC_NAME ${TEST_SRC} NAME_WE)

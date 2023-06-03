@@ -6,7 +6,7 @@ using namespace monkey::parser;
 using namespace monkey::parser::ast;
 
 template<typename T>
-T* getAs(AstNode auto* s){
+T* getAs(AstChildNode auto* s){
   auto stmt = dynamic_cast<T*>(s);
   if(stmt == nullptr){
     BOOST_FAIL("s not *T. Got " + std::string(typeid(s).name()));
