@@ -130,3 +130,24 @@ BOOST_AUTO_TEST_CASE(TestIfElseExpressions) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE(TestEvalReturnStatements) {
+  struct Test {
+    std::string input;
+    int64_t expected;
+  };
+
+  std::vector<Test> tests = {
+      {"return 10;", 10},
+      {"return 10; 9;", 10},
+      {"return 2 * 5; 9;", 10},
+      {"9; return 2 * 5; 9;", 10},
+      {"if (10 > 1) { if (10 > 1) { return 10; } return 1; }", 10}
+  };
+
+  for (auto &[input, expected] : tests) {
+    auto evaluated = testEval(input);
+    std::cout << (*evaluated).type() << std::endl;
+    testIntegerObject(*evaluated, expected);
+  }
+}
