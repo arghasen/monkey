@@ -24,5 +24,10 @@ std::string ReturnValue::to_string() const { return value_->to_string(); }
 
 std::string ReturnValue::type() const { return RETURN_VALUE_OBJ; }
 
+std::string Error::to_string() const { return message_; }
+
+std::string Error::type() const { return ERROR_OBJ; }
+
+Error::Error(std::string message) : message_(std::move(message)) {}
 
 } // namespace monkey::evaluator

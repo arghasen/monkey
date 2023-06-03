@@ -151,3 +151,29 @@ BOOST_AUTO_TEST_CASE(TestEvalReturnStatements) {
     testIntegerObject(*evaluated, expected);
   }
 }
+
+BOOST_AUTO_TEST_CASE(TestErrorHandling){
+    struct Test {
+        std::string input;
+        std::string expectedMessage;
+    };
+    
+    std::vector<Test> tests = {
+        {"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+        {"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+        {"-true", "unknown operator: - BOOLEAN"},
+        // {"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+        // {"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+        // {"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+        // {"if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", "unknown operator: BOOLEAN + BOOLEAN"},
+        // {"foobar", "identifier not found: foobar"},
+        // {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
+        // {"{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: FUNCTION"}
+    };
+    
+    for (auto &[input, expectedMessage] : tests) {
+        auto evaluated = testEval(input);
+        BOOST_CHECK_EQUAL(evaluated->type(), ERROR_OBJ);
+        BOOST_CHECK_EQUAL(dynamic_cast<const Error &>(*evaluated).message_, expectedMessage);
+    }
+}
