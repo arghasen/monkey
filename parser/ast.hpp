@@ -191,8 +191,10 @@ public:
   Arguments arguments;
 };
 
+template<typename T>
+concept AstNode = std::is_base_of<ast::Node, T>::value;
 template<typename Y>
-concept AstNode = std::is_same<Y, Statement>::value || std::is_same<Y, ast::Expression>::value;
+concept AstChildNode = std::is_same<Y, Statement>::value || std::is_same<Y, ast::Expression>::value;
 
 template<typename T>
 concept ExpressionNode = std::is_base_of<ast::Expression, T>::value;
