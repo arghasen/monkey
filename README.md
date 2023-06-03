@@ -36,5 +36,5 @@ AST based parser
 - Error Handling
 - Conditionals
 - Return Values
-
 - Variables and Functions as first class citizens
+- Function evaluation and closures
