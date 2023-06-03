@@ -205,15 +205,21 @@ ObjectPtr Evaluator::doEval(parser::ast::CallExpression *node, Environment* env)
   return nullptr;
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment* env) { return nullptr; }
+ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment* env) { 
+    auto value = env->get(node->value);
+    if(value.found){
+        return value.value;
+    }
+    return makeError("identifier not found:", node->value);
+}
 
 ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node, Environment* env) { 
     auto value = eval(node->value.get(),env);
          if (isError(value)) {
             return value;
         }
-
-    return nullptr;
+    env->set(node->name->value,value);
+    return value;
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node, Environment* env) {
@@ -246,6 +252,5 @@ ObjectPtr Evaluator::doEval(parser::ast::Expression *node, Environment* env) {
   default:
     return nullptr;
   }
-  return nullptr;
 }
 } // namespace monkey::evaluator

@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(TestErrorHandling){
         {"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
         {"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
         {"if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", "unknown operator: BOOLEAN + BOOLEAN"},
-        // {"foobar", "identifier not found: foobar"},
+        {"foobar", "identifier not found: foobar"},
         // {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
         // {"{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: FUNCTION"}
     };
@@ -180,21 +180,21 @@ BOOST_AUTO_TEST_CASE(TestErrorHandling){
 }
 
 
-// BOOST_AUTO_TEST_CASE(TestEvalLetStatements) {
-//   struct Test {
-//     std::string input;
-//     int64_t expected;
-//   };
+BOOST_AUTO_TEST_CASE(TestEvalLetStatements) {
+  struct Test {
+    std::string input;
+    int64_t expected;
+  };
 
-//   std::vector<Test> tests = {
-//       {"let a = 5; a;", 5},
-//       {"let a = 5 * 5; a;", 25},
-//       {"let a = 5; let b = a; b;", 5},
-//       {"let a = 5; let b = a; let c = a + b + 5; c;", 15}
-//   };
+  std::vector<Test> tests = {
+      {"let a = 5; a;", 5},
+    //   {"let a = 5 * 5; a;", 25},
+    //   {"let a = 5; let b = a; b;", 5},
+    //   {"let a = 5; let b = a; let c = a + b + 5; c;", 15}
+  };
 
-//   for (auto &[input, expected] : tests) {
-//     auto evaluated = testEval(input);
-//     testIntegerObject(*evaluated, expected);
-//   }
-// }
+  for (auto &[input, expected] : tests) {
+    auto evaluated = testEval(input);
+    testIntegerObject(*evaluated, expected);
+  }
+}

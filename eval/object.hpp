@@ -70,7 +70,10 @@ public:
 class Environment{
 public:
   using Store = std::unordered_map<std::string, ObjectPtr>;
-  using StoreData = std::pair<ObjectPtr, bool>;
+  struct StoreData {
+    ObjectPtr value;
+    bool found;
+  };
   Environment() = default;
   ~Environment() = default;
   StoreData get(const std::string& name);
