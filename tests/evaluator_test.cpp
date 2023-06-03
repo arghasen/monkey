@@ -26,7 +26,8 @@ ObjectPtr testEval(const std::string &input) {
   auto p = monkey::parser::Parser(&l);
   auto program = p.parseProgram();
   auto evaluator = Evaluator();
-  return evaluator.eval(program.get());
+  auto env = Environment();
+  return evaluator.eval(program.get(),&env);
 }
 
 BOOST_AUTO_TEST_CASE(TestEvalIntegerExpressions) {
@@ -177,3 +178,23 @@ BOOST_AUTO_TEST_CASE(TestErrorHandling){
         BOOST_CHECK_EQUAL(dynamic_cast<const Error &>(*evaluated).message_, expectedMessage);
     }
 }
+
+
+// BOOST_AUTO_TEST_CASE(TestEvalLetStatements) {
+//   struct Test {
+//     std::string input;
+//     int64_t expected;
+//   };
+
+//   std::vector<Test> tests = {
+//       {"let a = 5; a;", 5},
+//       {"let a = 5 * 5; a;", 25},
+//       {"let a = 5; let b = a; b;", 5},
+//       {"let a = 5; let b = a; let c = a + b + 5; c;", 15}
+//   };
+
+//   for (auto &[input, expected] : tests) {
+//     auto evaluated = testEval(input);
+//     testIntegerObject(*evaluated, expected);
+//   }
+// }

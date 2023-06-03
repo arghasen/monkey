@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 namespace monkey {
 namespace evaluator {
@@ -64,6 +65,17 @@ public:
   std::string to_string() const override;
   std::string type() const override;
   std::string message_;
+};
+
+class Environment{
+public:
+  using Store = std::unordered_map<std::string, ObjectPtr>;
+  using StoreData = std::pair<ObjectPtr, bool>;
+  Environment() = default;
+  ~Environment() = default;
+  StoreData get(const std::string& name);
+  void set(const std::string& name, ObjectPtr value);
+  std::unordered_map<std::string, ObjectPtr> store_;
 };
 
 // class Function : public Object {

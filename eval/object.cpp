@@ -30,4 +30,16 @@ std::string Error::type() const { return ERROR_OBJ; }
 
 Error::Error(std::string message) : message_(std::move(message)) {}
 
+Environment::StoreData Environment::get(const std::string &name) {
+  auto it = store_.find(name);
+  if (it != store_.end()) {
+    return {it->second, true};
+  }
+  return StoreData{nullptr, false};
+}
+
+void Environment::set(const std::string &name, ObjectPtr value) {
+  store_.insert_or_assign( name,std::move(value));
+}
+
 } // namespace monkey::evaluator
