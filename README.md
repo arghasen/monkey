@@ -30,3 +30,5 @@ AST based parser
 - if/else 
 - Grouped Expressions
 
+## Evaluation
+- Integers and Booleans

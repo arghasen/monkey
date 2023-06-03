@@ -1,6 +1,7 @@
 #include "lexer/lexer.hpp"
 #include "lexer/token.hpp"
 #include "parser/parser.hpp"
+#include "eval/evaluator.hpp"
 
 #include <iostream>
 #include <version.hpp>
@@ -38,7 +39,7 @@ int main() {
     if (input == "exit") {
       break;
     }
-    std::cout << input << std::endl;
+    std::cout << "Input: " << input << std::endl;
     monkey::lexer::Lexer l(input);
     monkey::parser::Parser p(&l);
     auto program = p.parseProgram();
@@ -46,7 +47,12 @@ int main() {
       printParserErrors(p.getErrors());
       continue;
     }
-    std::cout << program->to_string() << std::endl;
+    std::cout << "Parsed: " <<program->to_string() << std::endl;
+
+    auto evaluated = monkey::evaluator::Evaluator().eval(program.get());
+    if (evaluated != nullptr) {
+      std::cout <<"Evaluated: " << evaluated->to_string() << std::endl;
+    }
   }
   return 0;
 }
