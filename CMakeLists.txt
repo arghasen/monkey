@@ -18,6 +18,8 @@ add_library(MonkeyInterpreter STATIC
     lexer/token.cpp
     parser/ast.cpp
     parser/parser.cpp
+    eval/object.cpp
+    eval/evaluator.cpp
 )
 
 # Link the MonkeyInterpreter target with gcov
@@ -50,6 +52,7 @@ set(TESTS_SRC
     tests/lexer_test.cpp 
     tests/parser_test.cpp
     tests/ast_test.cpp
+    tests/evaluator_test.cpp
     )
 # Add the Monkey Interpreter test executable
 add_executable(MonkeyInterpreterTest ${TESTS_SRC})

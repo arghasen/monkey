@@ -1,4 +1,4 @@
-##include "object.hpp"
+#include "object.hpp"
 
 namespace monkey::evaluator {
 
@@ -17,7 +17,5 @@ std::string Boolean::type() const { return BOOLEAN_OBJ; }
 std::string Null::to_string() const { return "null"; }
 
 std::string Null::type() const { return NULL_OBJ; }
-
-
 
 } // namespace monkey::evaluator
