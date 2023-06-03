@@ -32,3 +32,9 @@ AST based parser
 
 ## Evaluation
 - Integers and Booleans
+- Expressions
+- Error Handling
+- Conditionals
+- Return Values
+
+- Variables and Functions as first class citizens
