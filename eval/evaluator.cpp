@@ -1,5 +1,7 @@
 #include "evaluator.hpp"
 #include <iostream>
+#include <sstream>
+
 namespace monkey::evaluator {
 
 const static auto TRUE = std::make_shared<Boolean>(true);
@@ -20,6 +22,21 @@ bool isTruthy(ObjectPtr obj) {
 
 ObjectPtr getBoolean(bool value) { return value ? TRUE : FALSE; }
 
+template <typename... Args>
+ObjectPtr makeError(std::string message, Args... args) { 
+   std::ostringstream oss ;
+   oss << message;
+   ((oss << " " << args), ...);
+   return std::make_shared<Error>(oss.str());
+}
+
+bool isError(ObjectPtr obj) {
+  if (obj != nullptr) {
+    return obj->type() == ERROR_OBJ;
+  }
+  return false;
+}
+
 ObjectPtr evalBangOperatorExpression(ObjectPtr right) {
   if (right == TRUE) {
     return FALSE;
@@ -34,7 +51,7 @@ ObjectPtr evalBangOperatorExpression(ObjectPtr right) {
 
 ObjectPtr evalMinusPrefixOperatorExpression(ObjectPtr right) {
   if (right->type() != INTEGER_OBJ) {
-    return nullptr;
+    return makeError("unknown operator: -", right->type());
   }
   auto value = static_cast<Integer *>(right.get())->value_;
   return std::make_shared<Integer>(-value);
@@ -61,7 +78,7 @@ ObjectPtr evalIntegerInfixExpression(const std::string &op, ObjectPtr left,
   } else if (op == "!=") {
     return getBoolean(leftVal != rightVal);
   } else {
-    return NullObject;
+    return makeError("unknown operator: ", op, left->type(), right->type());
   }
 }
 
@@ -71,7 +88,7 @@ ObjectPtr evalPrefixExpression(const std::string &op, ObjectPtr right) {
   } else if (op == "-") {
     return evalMinusPrefixOperatorExpression(right);
   } else {
-    return NullObject;
+    return makeError("unknown operator:", op, right->type());
   }
 }
 
@@ -84,9 +101,9 @@ ObjectPtr evalInfixExpression(const std::string &op, ObjectPtr left,
   } else if (op == "!=") {
     return getBoolean(left != right);
   } else if (left->type() != right->type()) {
-    return NullObject;
+    return makeError("type mismatch:", left->type(), op, right->type());
   } else {
-    return NullObject;
+    return makeError("unknown operator:", left->type(), op, right->type());
   }
 }
 
@@ -98,6 +115,9 @@ ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node) {
     if (result->type() == RETURN_VALUE_OBJ){
       return static_cast<ReturnValue*>(result.get())->value_;
     }
+    if(result->type() == ERROR_OBJ){
+      return result;
+    }
   }
   return result;
 }
@@ -107,8 +127,11 @@ ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node) {
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
     result = eval(stmt.get());
-    if (result && result->type() == RETURN_VALUE_OBJ){
-      return result;
+    if(result){
+      auto res = result->type();
+      if (res == RETURN_VALUE_OBJ || res == ERROR_OBJ){
+        return result;
+      }
     }
   }
   return result;
@@ -142,17 +165,29 @@ ObjectPtr Evaluator::doEval(parser::ast::Boolean *node) {
 
 ObjectPtr Evaluator::doEval(parser::ast::InfixExpression *node) {
   auto left = eval(node->left.get());
+  if (isError(left)) {
+    return left;
+  }
   auto right = eval(node->right.get());
+    if (isError(right)) {
+        return right;
+    }
   return evalInfixExpression(node->op, left, right);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::PrefixExpression *node) {
   auto right = eval(node->right.get());
+    if (isError(right)) {
+        return right;
+    }
   return evalPrefixExpression(node->op, right);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node) {
   auto condition = eval(node->condition.get());
+    if (isError(condition)) {
+        return condition;
+    }
   if (isTruthy(condition)) {
     return eval(node->consequence.get());
   } else if (node->alternative != nullptr) {
@@ -176,6 +211,9 @@ ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node) { return nullptr; }
 
 ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node) {
     auto value = eval(node->returnValue.get());
+    if(isError(value)){
+        return value;
+    }
     return std::make_shared<ReturnValue>(value);
 }
 
