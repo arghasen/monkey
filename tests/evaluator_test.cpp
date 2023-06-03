@@ -27,7 +27,7 @@ ObjectPtr testEval(const std::string &input) {
   auto program = p.parseProgram();
   auto evaluator = Evaluator();
   auto env = Environment();
-  return evaluator.eval(program.get(),&env);
+  return evaluator.eval(program.get(), &env);
 }
 
 BOOST_AUTO_TEST_CASE(TestEvalIntegerExpressions) {
@@ -112,15 +112,13 @@ BOOST_AUTO_TEST_CASE(TestIfElseExpressions) {
     std::optional<int64_t> expected;
   };
 
-  std::vector<Test> tests = {
-      {"if (true) { 10 }", 10},
-      {"if (false) { 10 }", std::nullopt},
-      {"if (1) { 10 }", 10},
-      {"if (1 < 2) { 10 }", 10},
-      {"if (1 > 2) { 10 }", std::nullopt},
-      {"if (1 > 2) { 10 } else { 20 }", 20},
-      {"if (1 < 2) { 10 } else { 20 }", 10}
-  };
+  std::vector<Test> tests = {{"if (true) { 10 }", 10},
+                             {"if (false) { 10 }", std::nullopt},
+                             {"if (1) { 10 }", 10},
+                             {"if (1 < 2) { 10 }", 10},
+                             {"if (1 > 2) { 10 }", std::nullopt},
+                             {"if (1 > 2) { 10 } else { 20 }", 20},
+                             {"if (1 < 2) { 10 } else { 20 }", 10}};
 
   for (auto &[input, expected] : tests) {
     auto evaluated = testEval(input);
@@ -143,8 +141,7 @@ BOOST_AUTO_TEST_CASE(TestEvalReturnStatements) {
       {"return 10; 9;", 10},
       {"return 2 * 5; 9;", 10},
       {"9; return 2 * 5; 9;", 10},
-      {"if (10 > 1) { if (10 > 1) { return 10; } return 1; }", 10}
-  };
+      {"if (10 > 1) { if (10 > 1) { return 10; } return 1; }", 10}};
 
   for (auto &[input, expected] : tests) {
     auto evaluated = testEval(input);
@@ -153,32 +150,34 @@ BOOST_AUTO_TEST_CASE(TestEvalReturnStatements) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestErrorHandling){
-    struct Test {
-        std::string input;
-        std::string expectedMessage;
-    };
-    
-    std::vector<Test> tests = {
-        {"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
-        {"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
-        {"-true", "unknown operator: - BOOLEAN"},
-        {"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
-        {"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
-        {"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
-        {"if (10 > 1) { if (10 > 1) { return true + false; } return 1; }", "unknown operator: BOOLEAN + BOOLEAN"},
-        {"foobar", "identifier not found: foobar"},
-        // {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
-        // {"{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key: FUNCTION"}
-    };
-    
-    for (auto &[input, expectedMessage] : tests) {
-        auto evaluated = testEval(input);
-        BOOST_CHECK_EQUAL(evaluated->type(), ERROR_OBJ);
-        BOOST_CHECK_EQUAL(dynamic_cast<const Error &>(*evaluated).message_, expectedMessage);
-    }
-}
+BOOST_AUTO_TEST_CASE(TestErrorHandling) {
+  struct Test {
+    std::string input;
+    std::string expectedMessage;
+  };
 
+  std::vector<Test> tests = {
+      {"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+      {"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+      {"-true", "unknown operator: - BOOLEAN"},
+      {"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+      {"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+      {"if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+      {"if (10 > 1) { if (10 > 1) { return true + false; } return 1; }",
+       "unknown operator: BOOLEAN + BOOLEAN"},
+      {"foobar", "identifier not found: foobar"},
+      // {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
+      // {"{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key:
+      // FUNCTION"}
+  };
+
+  for (auto &[input, expectedMessage] : tests) {
+    auto evaluated = testEval(input);
+    BOOST_CHECK_EQUAL(evaluated->type(), ERROR_OBJ);
+    BOOST_CHECK_EQUAL(dynamic_cast<const Error &>(*evaluated).message_,
+                      expectedMessage);
+  }
+}
 
 BOOST_AUTO_TEST_CASE(TestEvalLetStatements) {
   struct Test {
@@ -188,13 +187,22 @@ BOOST_AUTO_TEST_CASE(TestEvalLetStatements) {
 
   std::vector<Test> tests = {
       {"let a = 5; a;", 5},
-    //   {"let a = 5 * 5; a;", 25},
-    //   {"let a = 5; let b = a; b;", 5},
-    //   {"let a = 5; let b = a; let c = a + b + 5; c;", 15}
-  };
+      {"let a = 5 * 5; a;", 25},
+      {"let a = 5; let b = a; b;", 5},
+      {"let a = 5; let b = a; let c = a + b + 5; c;", 15}};
 
   for (auto &[input, expected] : tests) {
     auto evaluated = testEval(input);
     testIntegerObject(*evaluated, expected);
   }
+}
+
+BOOST_AUTO_TEST_CASE(TestEvalFunctionObject){
+    auto input = "fn(x) { x + 2; };";
+    auto evaluated = testEval(input);
+    BOOST_CHECK_EQUAL(evaluated->type(), FUNCTION_OBJ);
+    auto fn = dynamic_cast<const Function*>(evaluated.get());
+    BOOST_CHECK_EQUAL(fn->parameters.size(), 1);
+    BOOST_CHECK_EQUAL(fn->parameters[0]->to_string(), "x");
+    BOOST_CHECK_EQUAL(fn->body->to_string(), "(x + 2)");
 }

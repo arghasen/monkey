@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include "../parser/ast.hpp"
 
 namespace monkey {
 namespace evaluator {
@@ -81,16 +82,16 @@ public:
   std::unordered_map<std::string, ObjectPtr> store_;
 };
 
-// class Function : public Object {
-// public:
-//   Function(std::vector<std::string> parameters, std::string body);
-//   ~Function() override = default;
-//   std::string to_string() const override;
-//   std::string type() const override;
-//   std::vector<std::string> parameters_;
-//   std::string body_;
-//   ObjectPtr env_;
-// };
+class Function : public Object {
+public:
+  Function(parser::ast::Parameters params, std::unique_ptr<parser::ast::BlockStatement> body, Environment* env);
+  ~Function() override = default;
+  std::string to_string() const override;
+  std::string type() const override;
+  parser::ast::Parameters parameters;
+  std::unique_ptr<parser::ast::BlockStatement> body;
+  Environment* env_;
+};
 
 } // namespace evaluator
 } // namespace monkey
