@@ -108,7 +108,7 @@ ObjectPtr evalInfixExpression(const std::string &op, ObjectPtr left,
 }
 
 ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node,
-                                 Environment *env) {
+                                 Environment env) {
   std::cout << "evaluating statements" << std::endl;
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
@@ -124,7 +124,7 @@ ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node,
 }
 
 ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node,
-                                        Environment *env) {
+                                        Environment env) {
   std::cout << "evaluating block statement" << std::endl;
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
@@ -139,7 +139,7 @@ ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node,
   return result;
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::Statement *node, Environment *env) {
+ObjectPtr Evaluator::doEval(parser::ast::Statement *node, Environment env) {
   std::cout << "evaluating statement" << std::endl;
   switch (node->Type()) {
   case parser::ast::StatementType::LET:
@@ -154,21 +154,21 @@ ObjectPtr Evaluator::doEval(parser::ast::Statement *node, Environment *env) {
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::ExpressionStatement *node,
-                            Environment *env) {
+                            Environment env) {
   return eval(node->expression.get(), env);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::IntegerLiteral *node,
-                            Environment *env) {
+                            Environment env) {
   return std::make_shared<Integer>(node->value);
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::Boolean *node, Environment *env) {
+ObjectPtr Evaluator::doEval(parser::ast::Boolean *node, Environment env) {
   return getBoolean(node->value);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::InfixExpression *node,
-                            Environment *env) {
+                            Environment env) {
   auto left = eval(node->left.get(), env);
   if (isError(left)) {
     return left;
@@ -181,7 +181,7 @@ ObjectPtr Evaluator::doEval(parser::ast::InfixExpression *node,
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::PrefixExpression *node,
-                            Environment *env) {
+                            Environment env) {
   auto right = eval(node->right.get(), env);
   if (isError(right)) {
     return right;
@@ -189,7 +189,7 @@ ObjectPtr Evaluator::doEval(parser::ast::PrefixExpression *node,
   return evalPrefixExpression(node->op, right);
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node, Environment *env) {
+ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node, Environment env) {
   auto condition = eval(node->condition.get(), env);
   if (isError(condition)) {
     return condition;
@@ -204,16 +204,59 @@ ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node, Environment *env) {
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::FunctionLiteral *node,
-                            Environment *env) {
+                            Environment env) {
     return std::make_shared<Function>(std::move(node->parameters), std::move(node->body), env);
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::CallExpression *node,
-                            Environment *env) {
-  return nullptr;
+Results Evaluator::evalExpressions(const parser::ast::Arguments &args, Environment env) {
+    std::vector<ObjectPtr> result;
+    for (auto &arg : args) {
+        auto evaluated = eval(arg.get(), env);
+        if (isError(evaluated)) {
+            return Results{evaluated};
+        }
+        result.push_back(evaluated);
+    }
+    return result;
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment *env) {
+Environment extendFunctionEnv(Function *fn, const Results &args) {
+    auto env = new_enclosed_environment(fn->env_);
+    for (size_t i = 0; i < fn->parameters.size(); i++) {
+        env->set(fn->parameters[i]->value, args[i]);
+    }
+    return env;
+}
+
+ObjectPtr unwrapReturnValue(ObjectPtr obj) {
+    if (obj->type() == RETURN_VALUE_OBJ) {
+        return static_cast<ReturnValue*>(obj.get())->value_;
+    }
+    return obj;
+}
+
+ObjectPtr Evaluator::applyFunction(ObjectPtr fn, const Results& args){
+    auto function = dynamic_cast<Function*>(fn.get());
+    std::cout << "applying function" << fn->to_string()<< std::endl;
+    auto extendedEnv = extendFunctionEnv(function, args);
+    auto evaluated = eval(function->body.get(), extendedEnv);
+    return unwrapReturnValue(evaluated);
+}
+
+ObjectPtr Evaluator::doEval(parser::ast::CallExpression *node,
+                            Environment env) {
+    auto function = eval(node->function.get(), env);
+    if (isError(function)) {
+        return function;
+    }
+    auto args = evalExpressions(node->arguments, env);
+    if (args.size() == 1 && isError(args[0])) {
+        return args[0];
+    }
+    return applyFunction(function, args);
+}
+
+ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment env) {
   auto value = env->get(node->value);
   if (value.found) {
     return value.value;
@@ -221,7 +264,7 @@ ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment *env) {
   return makeError("identifier not found:", node->value);
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node, Environment *env) {
+ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node, Environment env) {
   auto value = eval(node->value.get(), env);
   if (isError(value)) {
     return value;
@@ -231,7 +274,7 @@ ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node, Environment *env) {
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node,
-                            Environment *env) {
+                            Environment env) {
   auto value = eval(node->returnValue.get(), env);
   if (isError(value)) {
     return value;
@@ -239,7 +282,7 @@ ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node,
   return std::make_shared<ReturnValue>(value);
 }
 
-ObjectPtr Evaluator::doEval(parser::ast::Expression *node, Environment *env) {
+ObjectPtr Evaluator::doEval(parser::ast::Expression *node, Environment env) {
   std::cout << "evaluating expression" << (int)node->Type() << std::endl;
   switch (node->Type()) {
   case parser::ast::ExpressionType::IDENTIFIER:

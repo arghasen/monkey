@@ -32,7 +32,7 @@ void printParserErrors(const std::vector<std::string> &errors) {
 int main() {
   std::cout << "Hello, Monkey! version : " << VERSION << std::endl;
   std::cout << "Feel free to type in commands" << std::endl;
-  monkey::evaluator::Environment env;
+  auto env = std::make_shared<monkey::evaluator::EnvironmentImpl>();
   while (1) {
     std::cout << PROMPT;
     std::string input;
@@ -50,7 +50,7 @@ int main() {
     }
     std::cout << "Parsed: " <<program->to_string() << std::endl;
 
-    auto evaluated = monkey::evaluator::Evaluator().eval(program.get(), &env);
+    auto evaluated = monkey::evaluator::Evaluator().eval(program.get(), env);
     if (evaluated != nullptr) {
       std::cout <<"Evaluated: " << evaluated->to_string() << std::endl;
     }
