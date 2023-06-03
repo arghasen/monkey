@@ -18,6 +18,7 @@ Parser::Parser(lexer::Lexer *l) : l(l) {
   registerPrefix(lexer::TokenType::LPAREN, &Parser::parseGroupedExpression);
   registerPrefix(lexer::TokenType::IF, &Parser::parseIfExpression);
   registerPrefix(lexer::TokenType::FUNCTION, &Parser::parseFunctionLiteral);
+  registerPrefix(lexer::TokenType::STRING, &Parser::parseStringLiteral);
 
   registerInfix(lexer::TokenType::PLUS, &Parser::parseInfixExpression);
   registerInfix(lexer::TokenType::MINUS, &Parser::parseInfixExpression);
@@ -266,6 +267,10 @@ ast::Arguments Parser::parseCallArguments(){
         return {};
     }
     return arguments;
+}
+
+Expression Parser::parseStringLiteral() {
+  return std::make_unique<ast::StringLiteral>(curToken);
 }
 
 bool Parser::curTokenIs(lexer::TokenType type) { return curToken.type == type; }

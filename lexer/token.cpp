@@ -76,6 +76,8 @@ std::string to_string(TokenType tok) {
     return "ELSE";
   case TokenType::RETURN:
     return "RETURN";
+  case TokenType::STRING:
+    return "STRING";
   default:
     return "";
   }

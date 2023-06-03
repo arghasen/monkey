@@ -167,6 +167,10 @@ ObjectPtr Evaluator::doEval(parser::ast::Boolean *node, Environment env) {
   return getBoolean(node->value);
 }
 
+ObjectPtr Evaluator::doEval(parser::ast::StringLiteral *node, Environment env) {
+  return std::make_shared<String>(node->value);
+}
+
 ObjectPtr Evaluator::doEval(parser::ast::InfixExpression *node,
                             Environment env) {
   auto left = eval(node->left.get(), env);
@@ -303,6 +307,8 @@ ObjectPtr Evaluator::doEval(parser::ast::Expression *node, Environment env) {
     return doEval(static_cast<parser::ast::FunctionLiteral *>(node), env);
   case parser::ast::ExpressionType::CALL:
     return doEval(static_cast<parser::ast::CallExpression *>(node), env);
+  case parser::ast::ExpressionType::STRING:
+    return doEval(static_cast<parser::ast::StringLiteral *>(node), env);
   default:
     return nullptr;
   }

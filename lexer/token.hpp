@@ -15,6 +15,7 @@ enum class TokenType {
   // Identifiers + literals
   IDENT,
   INT,
+    STRING,
 
   // operators
   ASSIGN,

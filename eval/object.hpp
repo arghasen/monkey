@@ -14,6 +14,7 @@ constexpr OBJECT_TYPE NULL_OBJ = "NULL";
 constexpr OBJECT_TYPE RETURN_VALUE_OBJ = "RETURN_VALUE";
 constexpr OBJECT_TYPE ERROR_OBJ = "ERROR";
 constexpr OBJECT_TYPE FUNCTION_OBJ = "FUNCTION";
+constexpr OBJECT_TYPE STRING_OBJ = "STRING";
 
 class Object {
 public:
@@ -97,6 +98,15 @@ public:
   parser::ast::Parameters parameters;
   std::unique_ptr<parser::ast::BlockStatement> body;
   Environment env_;
+};
+
+class String : public Object {
+public:
+  explicit String(std::string value);
+  ~String() override = default;
+  std::string to_string() const override;
+  std::string type() const override;
+  std::string value_;
 };
 
 Environment new_enclosed_environment(Environment outer);

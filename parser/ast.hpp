@@ -30,6 +30,7 @@ enum class ExpressionType {
   IF,
   FUNCTION,
   CALL,
+  STRING,
 };
 
 class Node {
@@ -189,6 +190,15 @@ public:
   constexpr ExpressionType Type() const override;
   std::unique_ptr<Expression> function;
   Arguments arguments;
+};
+
+class StringLiteral : public Expression {
+public:
+  explicit StringLiteral(lexer::Token tok);
+  ~StringLiteral() override = default;
+  std::string to_string() const override;
+  constexpr ExpressionType Type() const override;
+  std::string value;
 };
 
 template<typename T>

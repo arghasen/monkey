@@ -98,6 +98,10 @@ lexer::Token Lexer::nextToken() {
     tok.type = TokenType::EOFILE;
     tok.literal = "";
     break;
+  case '"':
+    tok.type = TokenType::STRING;
+    tok.literal = readString();
+    break;
   default:
     if (std::isalpha(ch_)) {
       tok.literal = readIdentifier();
@@ -136,6 +140,14 @@ std::string Lexer::readNumber() {
   while (std::isdigit(ch_)) {
     readChar();
   }
+  return input_.substr(start, position_ - start);
+}
+
+std::string Lexer::readString() {
+  int start = position_ + 1;
+  do {
+    readChar();
+  } while (ch_ != '"' && ch_ != '\0');
   return input_.substr(start, position_ - start);
 }
 

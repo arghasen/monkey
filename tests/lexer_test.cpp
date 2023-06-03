@@ -162,3 +162,23 @@ BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
         BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
     }
 }
+
+BOOST_AUTO_TEST_CASE(TestNextTokenString) {
+    auto input = R"(
+    "foobar"
+    "foo bar"
+    )";
+
+    std::vector<Token> testResults = {
+        {TokenType::STRING, "foobar"},
+        {TokenType::STRING, "foo bar"},
+        {TokenType::EOFILE, ""}
+    };
+
+    monkey::lexer::Lexer lexer(input);
+    for (auto& [expectedType, expectedLiteral] : testResults) {
+        auto tok = lexer.nextToken();
+        BOOST_CHECK_EQUAL(tok.type, expectedType);
+        BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
+    }
+}

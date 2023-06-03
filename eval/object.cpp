@@ -79,4 +79,9 @@ ObjectPtr EnvironmentImpl::set(const std::string &name, ObjectPtr value) {
   return value;
 }
 
+String::String(std::string value) : value_(std::move(value)) {}
+
+std::string String::to_string() const { return value_; }
+
+std::string String::type() const { return STRING_OBJ; }
 } // namespace monkey::evaluator

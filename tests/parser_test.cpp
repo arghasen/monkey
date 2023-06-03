@@ -415,3 +415,17 @@ BOOST_AUTO_TEST_CASE(TestCallArgumentsParsing){
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE(TestStringLiteral){
+  std::string input = R"("hello world";)";
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  auto stmt = program->statements[0].get();
+  auto exprStmt = getAs<ExpressionStatement>(stmt);
+  auto literal = getAs<StringLiteral>(exprStmt->expression.get());
+  BOOST_REQUIRE_EQUAL(literal->value, "hello world");
+}

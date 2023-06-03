@@ -238,3 +238,11 @@ BOOST_AUTO_TEST_CASE(TestClosures) {
   auto evaluated = testEval(input);
   testIntegerObject(*evaluated, 4);
 }
+
+BOOST_AUTO_TEST_CASE(TestEvalStringLiteral) {
+  auto input = R"("Hello World!")";
+  auto evaluated = testEval(input);
+  BOOST_CHECK_EQUAL(evaluated->type(), STRING_OBJ);
+  auto str = dynamic_cast<const String *>(evaluated.get());
+  BOOST_CHECK_EQUAL(str->value_, "Hello World!");
+}
