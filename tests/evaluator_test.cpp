@@ -1,0 +1,89 @@
+#include "../eval/evaluator.hpp"
+#include "../lexer/lexer.hpp"
+#include "../parser/parser.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+using namespace monkey::evaluator;
+
+void testIntegerObject(const Object& obj, int64_t expected){
+    BOOST_CHECK_EQUAL(obj.type(), INTEGER_OBJ);
+    BOOST_CHECK_EQUAL(dynamic_cast<const Integer&>(obj).value_, expected);
+}
+
+void testBooleanObject(const Object& obj, bool expected){
+    BOOST_CHECK_EQUAL(obj.type(), BOOLEAN_OBJ);
+    BOOST_CHECK_EQUAL(dynamic_cast<const Boolean&>(obj).value_, expected);
+}
+
+ObjectPtr testEval(const std::string& input){
+    auto l = monkey::lexer::Lexer(input);
+    auto p = monkey::parser::Parser(&l);
+    auto program = p.parseProgram();
+    auto evaluator = Evaluator();
+    return evaluator.eval(program.get());
+}
+
+BOOST_AUTO_TEST_CASE(TestEvalIntegerExpressions){
+    struct Test {
+        std::string input;
+        int64_t expected;
+    };
+
+    std::vector<Test> tests = {
+        {"5", 5},
+        {"10", 10},
+        // {"-5", -5},
+        // {"-10", -10},
+        // {"5 + 5 + 5 + 5 - 10", 10},
+        // {"2 * 2 * 2 * 2 * 2", 32},
+        // {"-50 + 100 + -50", 0},
+        // {"5 * 2 + 10", 20},
+        // {"5 + 2 * 10", 25},
+        // {"20 + 2 * -10", 0},
+        // {"50 / 2 * 2 + 10", 60},
+        // {"2 * (5 + 10)", 30},
+        // {"3 * 3 * 3 + 10", 37},
+        // {"3 * (3 * 3) + 10", 37},
+        // {"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50}
+    };
+
+    for (auto& [input, expected] : tests) {
+        auto evaluated = testEval(input);
+        testIntegerObject(*evaluated, expected);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(TestEvalBooleanExpressions){
+    struct Test {
+        std::string input;
+        bool expected;
+    };
+
+    std::vector<Test> tests = {
+        {"true", true},
+        {"false", false},
+        // {"1 < 2", true},
+        // {"1 > 2", false},
+        // {"1 < 1", false},
+        // {"1 > 1", false},
+        // {"1 == 1", true},
+        // {"1 != 1", false},
+        // {"1 == 2", false},
+        // {"1 != 2", true},
+        // {"true == true", true},
+        // {"false == false", true},
+        // {"true == false", false},
+        // {"true != false", true},
+        // {"false != true", true},
+        // {"(1 < 2) == true", true},
+        // {"(1 < 2) == false", false},
+        // {"(1 > 2) == true", false},
+        // {"(1 > 2) == false", true}
+    };
+
+    for (auto& [input, expected] : tests) {
+        auto evaluated = testEval(input);
+        testBooleanObject(*evaluated, expected);
+    }
+}
