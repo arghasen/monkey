@@ -14,6 +14,17 @@ private:
     ObjectPtr doEval(const parser::ast::Statements& node);
     ObjectPtr doEval(parser::ast::Statement* node);
     ObjectPtr doEval(parser::ast::Expression* node);
+    ObjectPtr doEval(parser::ast::IntegerLiteral* node);
+    ObjectPtr doEval(parser::ast::Boolean* node);
+    ObjectPtr doEval(parser::ast::PrefixExpression* node);
+    ObjectPtr doEval(parser::ast::InfixExpression* node);
+    ObjectPtr doEval(parser::ast::IfExpression* node);
+    ObjectPtr doEval(parser::ast::FunctionLiteral* node);
+    ObjectPtr doEval(parser::ast::CallExpression* node);
+    ObjectPtr doEval(parser::ast::Identifier* node);
+    ObjectPtr doEval(parser::ast::LetStatement* node);
+    ObjectPtr doEval(parser::ast::ReturnStatement* node);
+    ObjectPtr doEval(parser::ast::BlockStatement* node);
 };
 
 ObjectPtr Evaluator::eval(auto* node) {

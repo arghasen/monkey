@@ -17,7 +17,7 @@ public:
   virtual std::string type() const = 0;
 };
 
-using ObjectPtr = std::unique_ptr<Object>;
+using ObjectPtr = std::shared_ptr<Object>;
 
 class Integer : public Object {
 public:

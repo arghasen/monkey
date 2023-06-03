@@ -87,3 +87,24 @@ BOOST_AUTO_TEST_CASE(TestEvalBooleanExpressions){
         testBooleanObject(*evaluated, expected);
     }
 }
+
+BOOST_AUTO_TEST_CASE(TestBangOperator){
+    struct Test {
+        std::string input;
+        bool expected;
+    };
+
+    std::vector<Test> tests = {
+        {"!true", false},
+        {"!false", true},
+        {"!5", false},
+        {"!!true", true},
+        {"!!false", false},
+        {"!!5", true}
+    };
+
+    for (auto& [input, expected] : tests) {
+        auto evaluated = testEval(input);
+        testBooleanObject(*evaluated, expected);
+    }
+}
