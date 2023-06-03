@@ -83,8 +83,7 @@ std::string to_string(TokenType tok) {
   }
 }
 
-std::ostream &operator<<(std::ostream &os, TokenType tok ){
-
+std::ostream &operator<<(std::ostream &os, TokenType tok) {
   os << to_string(tok);
   return os;
 }

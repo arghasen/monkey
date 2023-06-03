@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(TestErrorHandling) {
       {"if (10 > 1) { if (10 > 1) { return true + false; } return 1; }",
        "unknown operator: BOOLEAN + BOOLEAN"},
       {"foobar", "identifier not found: foobar"},
-      // {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
+      {"\"Hello\" - \"World\"", "unknown operator: STRING - STRING"},
       // {"{\"name\": \"Monkey\"}[fn(x) { x }];", "unusable as hash key:
       // FUNCTION"}
   };
@@ -241,6 +241,14 @@ BOOST_AUTO_TEST_CASE(TestClosures) {
 
 BOOST_AUTO_TEST_CASE(TestEvalStringLiteral) {
   auto input = R"("Hello World!")";
+  auto evaluated = testEval(input);
+  BOOST_CHECK_EQUAL(evaluated->type(), STRING_OBJ);
+  auto str = dynamic_cast<const String *>(evaluated.get());
+  BOOST_CHECK_EQUAL(str->value_, "Hello World!");
+}
+
+BOOST_AUTO_TEST_CASE(TestStringConcatenation) {
+  auto input = R"("Hello" + " " + "World!")";
   auto evaluated = testEval(input);
   BOOST_CHECK_EQUAL(evaluated->type(), STRING_OBJ);
   auto str = dynamic_cast<const String *>(evaluated.get());

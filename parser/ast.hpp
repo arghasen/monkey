@@ -38,8 +38,9 @@ public:
   virtual ~Node() = default;
   virtual std::string to_string() const = 0;
   virtual std::string TokenLiteral() const = 0;
+
 protected:
-    Node() = default;
+  Node() = default;
 };
 
 class Statement : public Node {
@@ -49,8 +50,9 @@ public:
   std::string TokenLiteral() const override;
   lexer::Token token;
   constexpr virtual StatementType Type() const = 0;
+
 protected:
-    explicit Statement(lexer::Token tok) ;
+  explicit Statement(lexer::Token tok);
 };
 
 using Statements = std::vector<std::unique_ptr<Statement>>;
@@ -62,8 +64,9 @@ public:
   std::string TokenLiteral() const override;
   lexer::Token token;
   constexpr virtual ExpressionType Type() const = 0;
+
 protected:
-    explicit Expression(lexer::Token tok) ;
+  explicit Expression(lexer::Token tok);
 };
 
 class Program : public Node {
@@ -171,7 +174,6 @@ public:
   std::unique_ptr<BlockStatement> alternative;
 };
 
-
 class FunctionLiteral : public Expression {
 public:
   explicit FunctionLiteral(lexer::Token tok);
@@ -201,12 +203,13 @@ public:
   std::string value;
 };
 
-template<typename T>
+template <typename T>
 concept AstNode = std::is_base_of<ast::Node, T>::value;
-template<typename Y>
-concept AstChildNode = std::is_same<Y, Statement>::value || std::is_same<Y, ast::Expression>::value;
+template <typename Y>
+concept AstChildNode = std::is_same<Y, Statement>::value ||
+                       std::is_same<Y, ast::Expression>::value;
 
-template<typename T>
+template <typename T>
 concept ExpressionNode = std::is_base_of<ast::Expression, T>::value;
 } // namespace ast
 } // namespace parser

@@ -73,7 +73,7 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
   nextToken();
   letstatement->value = parseExpression(Precedence::LOWEST);
   if (peekTokenIs(lexer::TokenType::SEMICOLON)) {
-      nextToken();
+    nextToken();
   }
   return letstatement;
 }
@@ -98,41 +98,42 @@ std::unique_ptr<ast::ExpressionStatement> Parser::parseExpressionStatement() {
   return expressionStatement;
 }
 
-Expression Parser::parseIfExpression(){
-    auto expression = std::make_unique<ast::IfExpression>(curToken);
-    if (!expectPeek(lexer::TokenType::LPAREN)) {
-        return nullptr;
-    }
+Expression Parser::parseIfExpression() {
+  auto expression = std::make_unique<ast::IfExpression>(curToken);
+  if (!expectPeek(lexer::TokenType::LPAREN)) {
+    return nullptr;
+  }
+  nextToken();
+  expression->condition = parseExpression(Precedence::LOWEST);
+  if (!expectPeek(lexer::TokenType::RPAREN)) {
+    return nullptr;
+  }
+  if (!expectPeek(lexer::TokenType::LBRACE)) {
+    return nullptr;
+  }
+  expression->consequence = parseBlockStatement();
+  if (peekTokenIs(lexer::TokenType::ELSE)) {
     nextToken();
-    expression->condition = parseExpression(Precedence::LOWEST);
-    if (!expectPeek(lexer::TokenType::RPAREN)) {
-        return nullptr;
-    }
     if (!expectPeek(lexer::TokenType::LBRACE)) {
-        return nullptr;
+      return nullptr;
     }
-    expression->consequence = parseBlockStatement();
-    if (peekTokenIs(lexer::TokenType::ELSE)) {
-        nextToken();
-        if (!expectPeek(lexer::TokenType::LBRACE)) {
-            return nullptr;
-        }
-        expression->alternative = parseBlockStatement();
-    }
-    return expression;
+    expression->alternative = parseBlockStatement();
+  }
+  return expression;
 }
 
 std::unique_ptr<ast::BlockStatement> Parser::parseBlockStatement() {
-    auto blockStatement = std::make_unique<ast::BlockStatement>(curToken);
-    nextToken();
-    while (!curTokenIs(lexer::TokenType::RBRACE) && !curTokenIs(lexer::TokenType::EOFILE)) {
-        auto statement = parseStatement();
-        if (statement != nullptr) {
-            blockStatement->statements.push_back(std::move(statement));
-        }
-        nextToken();
+  auto blockStatement = std::make_unique<ast::BlockStatement>(curToken);
+  nextToken();
+  while (!curTokenIs(lexer::TokenType::RBRACE) &&
+         !curTokenIs(lexer::TokenType::EOFILE)) {
+    auto statement = parseStatement();
+    if (statement != nullptr) {
+      blockStatement->statements.push_back(std::move(statement));
     }
-    return blockStatement;
+    nextToken();
+  }
+  return blockStatement;
 }
 
 void Parser::noPrefixParseFnError(lexer::TokenType type) {
@@ -209,64 +210,64 @@ Expression Parser::parseGroupedExpression() {
   return exp;
 }
 
-ast::Parameters Parser::parseFunctionParameters(){
-    ast::Parameters parameters;
-    if (peekTokenIs(lexer::TokenType::RPAREN)) {
-        nextToken();
-        return parameters;
-    }
+ast::Parameters Parser::parseFunctionParameters() {
+  ast::Parameters parameters;
+  if (peekTokenIs(lexer::TokenType::RPAREN)) {
+    nextToken();
+    return parameters;
+  }
+  nextToken();
+  auto identifier = std::make_unique<ast::Identifier>(curToken);
+  parameters.push_back(std::move(identifier));
+  while (peekTokenIs(lexer::TokenType::COMMA)) {
+    nextToken();
     nextToken();
     auto identifier = std::make_unique<ast::Identifier>(curToken);
     parameters.push_back(std::move(identifier));
-    while (peekTokenIs(lexer::TokenType::COMMA)) {
-        nextToken();
-        nextToken();
-        auto identifier = std::make_unique<ast::Identifier>(curToken);
-        parameters.push_back(std::move(identifier));
-    }
-    if (!expectPeek(lexer::TokenType::RPAREN)) {
-        return {};
-    }
-    return parameters;
+  }
+  if (!expectPeek(lexer::TokenType::RPAREN)) {
+    return {};
+  }
+  return parameters;
 }
 
-Expression Parser::parseFunctionLiteral(){
-    auto functionLiteral = std::make_unique<ast::FunctionLiteral>(curToken);
-    if (!expectPeek(lexer::TokenType::LPAREN)) {
-        return nullptr;
-    }
-    functionLiteral->parameters = parseFunctionParameters();
-    if (!expectPeek(lexer::TokenType::LBRACE)) {
-        return nullptr;
-    }
-    functionLiteral->body = parseBlockStatement();
-    return functionLiteral;
+Expression Parser::parseFunctionLiteral() {
+  auto functionLiteral = std::make_unique<ast::FunctionLiteral>(curToken);
+  if (!expectPeek(lexer::TokenType::LPAREN)) {
+    return nullptr;
+  }
+  functionLiteral->parameters = parseFunctionParameters();
+  if (!expectPeek(lexer::TokenType::LBRACE)) {
+    return nullptr;
+  }
+  functionLiteral->body = parseBlockStatement();
+  return functionLiteral;
 }
 
-Expression Parser::parseCallExpression(Expression function){
-    auto expression = std::make_unique<ast::CallExpression>(curToken);
-    expression->function = std::move(function);
-    expression->arguments = parseCallArguments();
-    return expression;
+Expression Parser::parseCallExpression(Expression function) {
+  auto expression = std::make_unique<ast::CallExpression>(curToken);
+  expression->function = std::move(function);
+  expression->arguments = parseCallArguments();
+  return expression;
 }
 
-ast::Arguments Parser::parseCallArguments(){
-    ast::Arguments arguments;
-    if (peekTokenIs(lexer::TokenType::RPAREN)) {
-        nextToken();
-        return arguments;
-    }
+ast::Arguments Parser::parseCallArguments() {
+  ast::Arguments arguments;
+  if (peekTokenIs(lexer::TokenType::RPAREN)) {
+    nextToken();
+    return arguments;
+  }
+  nextToken();
+  arguments.push_back(parseExpression(Precedence::LOWEST));
+  while (peekTokenIs(lexer::TokenType::COMMA)) {
+    nextToken();
     nextToken();
     arguments.push_back(parseExpression(Precedence::LOWEST));
-    while (peekTokenIs(lexer::TokenType::COMMA)) {
-        nextToken();
-        nextToken();
-        arguments.push_back(parseExpression(Precedence::LOWEST));
-    }
-    if (!expectPeek(lexer::TokenType::RPAREN)) {
-        return {};
-    }
-    return arguments;
+  }
+  if (!expectPeek(lexer::TokenType::RPAREN)) {
+    return {};
+  }
+  return arguments;
 }
 
 Expression Parser::parseStringLiteral() {

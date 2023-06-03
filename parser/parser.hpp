@@ -56,7 +56,7 @@ private:
   std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
   std::unique_ptr<ast::ExpressionStatement> parseExpressionStatement();
   std::unique_ptr<ast::BlockStatement> parseBlockStatement();
-  
+
   Expression parseExpression(Precedence precedence);
   Expression parseIdentifier();
   Expression parseIntegerLiteral();

@@ -51,7 +51,8 @@ FunctionLiteral::FunctionLiteral(lexer::Token tok)
 CallExpression::CallExpression(lexer::Token tok)
     : Expression(tok), function{nullptr}, arguments{} {}
 
-StringLiteral::StringLiteral(lexer::Token tok) : Expression(tok), value(tok.literal) {}
+StringLiteral::StringLiteral(lexer::Token tok)
+    : Expression(tok), value(tok.literal) {}
 
 std::string Expression::to_string() const { return token.literal; }
 
@@ -159,28 +160,46 @@ std::string CallExpression::to_string() const {
 
 std::string StringLiteral::to_string() const { return value; }
 
-constexpr StatementType LetStatement::Type() const { return StatementType::LET; }
-constexpr StatementType ReturnStatement::Type() const { return StatementType::RETURN; }
+constexpr StatementType LetStatement::Type() const {
+  return StatementType::LET;
+}
+constexpr StatementType ReturnStatement::Type() const {
+  return StatementType::RETURN;
+}
 constexpr StatementType ExpressionStatement::Type() const {
   return StatementType::EXPRESSION;
 }
-constexpr StatementType BlockStatement::Type() const { return StatementType::BLOCK; }
+constexpr StatementType BlockStatement::Type() const {
+  return StatementType::BLOCK;
+}
 
-constexpr ExpressionType Identifier::Type() const { return ExpressionType::IDENTIFIER; }
+constexpr ExpressionType Identifier::Type() const {
+  return ExpressionType::IDENTIFIER;
+}
 constexpr ExpressionType IntegerLiteral::Type() const {
   return ExpressionType::INTEGER;
 }
 constexpr ExpressionType PrefixExpression::Type() const {
   return ExpressionType::PREFIX;
 }
-constexpr ExpressionType InfixExpression::Type() const { return ExpressionType::INFIX; }
-constexpr ExpressionType Boolean::Type() const { return ExpressionType::BOOLEAN; }
-constexpr ExpressionType IfExpression::Type() const { return ExpressionType::IF; }
+constexpr ExpressionType InfixExpression::Type() const {
+  return ExpressionType::INFIX;
+}
+constexpr ExpressionType Boolean::Type() const {
+  return ExpressionType::BOOLEAN;
+}
+constexpr ExpressionType IfExpression::Type() const {
+  return ExpressionType::IF;
+}
 constexpr ExpressionType FunctionLiteral::Type() const {
   return ExpressionType::FUNCTION;
 }
-constexpr ExpressionType CallExpression::Type() const { return ExpressionType::CALL; }
-constexpr ExpressionType StringLiteral::Type() const { return ExpressionType::STRING; }
+constexpr ExpressionType CallExpression::Type() const {
+  return ExpressionType::CALL;
+}
+constexpr ExpressionType StringLiteral::Type() const {
+  return ExpressionType::STRING;
+}
 
 } // namespace ast
 } // namespace parser

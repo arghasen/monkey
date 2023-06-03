@@ -82,6 +82,17 @@ ObjectPtr evalIntegerInfixExpression(const std::string &op, ObjectPtr left,
   }
 }
 
+ObjectPtr evalStringInfixExpression(const std::string &op, ObjectPtr left,
+                                    ObjectPtr right) {
+  auto leftVal = static_cast<String *>(left.get())->value_;
+  auto rightVal = static_cast<String *>(right.get())->value_;
+  if (op == "+") {
+    return std::make_shared<String>(leftVal + rightVal);
+  } else {
+    return makeError("unknown operator:", left->type(), op, right->type());
+  }
+}
+
 ObjectPtr evalPrefixExpression(const std::string &op, ObjectPtr right) {
   if (op == "!") {
     return evalBangOperatorExpression(right);
@@ -96,6 +107,8 @@ ObjectPtr evalInfixExpression(const std::string &op, ObjectPtr left,
                               ObjectPtr right) {
   if (left->type() == INTEGER_OBJ && right->type() == INTEGER_OBJ) {
     return evalIntegerInfixExpression(op, left, right);
+  } else if (left->type() == STRING_OBJ && right->type() == STRING_OBJ) {
+    return evalStringInfixExpression(op, left, right);
   } else if (op == "==") {
     return getBoolean(left == right);
   } else if (op == "!=") {

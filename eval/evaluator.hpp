@@ -30,7 +30,7 @@ private:
   ObjectPtr doEval(parser::ast::LetStatement *node, Environment env);
   ObjectPtr doEval(parser::ast::ReturnStatement *node, Environment env);
   ObjectPtr doEval(parser::ast::ExpressionStatement *node, Environment env);
-    ObjectPtr doEval(parser::ast::StringLiteral *node, Environment env);
+  ObjectPtr doEval(parser::ast::StringLiteral *node, Environment env);
 };
 
 ObjectPtr Evaluator::eval(monkey::parser::ast::AstNode auto *node,
