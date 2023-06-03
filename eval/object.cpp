@@ -18,4 +18,11 @@ std::string Null::to_string() const { return "null"; }
 
 std::string Null::type() const { return NULL_OBJ; }
 
+ReturnValue::ReturnValue(ObjectPtr value) : value_(std::move(value)) {}
+
+std::string ReturnValue::to_string() const { return value_->to_string(); }
+
+std::string ReturnValue::type() const { return RETURN_VALUE_OBJ; }
+
+
 } // namespace monkey::evaluator

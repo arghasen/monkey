@@ -11,7 +11,9 @@ public:
   ObjectPtr eval(monkey::parser::ast::AstNode auto *node);
 
 private:
-  ObjectPtr doEval(const parser::ast::Statements &node);
+  ObjectPtr evalProgram(const parser::ast::Statements &node);
+  ObjectPtr evalBlockStatement(const parser::ast::Statements &node);
+
   ObjectPtr doEval(parser::ast::Statement *node);
   ObjectPtr doEval(parser::ast::Expression *node);
   ObjectPtr doEval(parser::ast::IntegerLiteral *node);
@@ -24,7 +26,7 @@ private:
   ObjectPtr doEval(parser::ast::Identifier *node);
   ObjectPtr doEval(parser::ast::LetStatement *node);
   ObjectPtr doEval(parser::ast::ReturnStatement *node);
-  ObjectPtr doEval(parser::ast::BlockStatement *node);
+  ObjectPtr doEval(parser::ast::ExpressionStatement *node);
 };
 
 ObjectPtr Evaluator::eval(monkey::parser::ast::AstNode auto *node) {
@@ -38,11 +40,11 @@ ObjectPtr Evaluator::eval(monkey::parser::ast::AstNode auto *node) {
   constexpr auto isExpression =
       std::is_same_v<parser::ast::Expression, std::decay_t<decltype(*node)>>;
 
-  if constexpr (isProram || isBlockStatements) {
-    return doEval(node->statements);
-  } else if constexpr (isStatement) {
-    return doEval(node);
-  } else if constexpr (isExpression) {
+  if constexpr (isProram) {
+    return evalProgram(node->statements);
+    } else if constexpr (isBlockStatements) {
+    return evalBlockStatement(node->statements);
+  } else if constexpr (isStatement || isExpression) {
     return doEval(node);
   } else {
     std::cout << "evaluating node" << std::endl;

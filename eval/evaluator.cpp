@@ -90,21 +90,46 @@ ObjectPtr evalInfixExpression(const std::string &op, ObjectPtr left,
   }
 }
 
-ObjectPtr Evaluator::doEval(const parser::ast::Statements &node) {
+ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node) {
   std::cout << "evaluating statements" << std::endl;
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
     result = eval(stmt.get());
+    if (result->type() == RETURN_VALUE_OBJ){
+      return static_cast<ReturnValue*>(result.get())->value_;
+    }
   }
   return result;
 }
+
+ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node) {
+  std::cout << "evaluating block statement" << std::endl;
+  std::shared_ptr<Object> result;
+  for (auto &stmt : node) {
+    result = eval(stmt.get());
+    if (result && result->type() == RETURN_VALUE_OBJ){
+      return result;
+    }
+  }
+  return result;
+}
+
 ObjectPtr Evaluator::doEval(parser::ast::Statement *node) {
   std::cout << "evaluating statement" << std::endl;
-  if (node->Type() == parser::ast::StatementType::EXPRESSION) {
-    return eval(static_cast<parser::ast::ExpressionStatement *>(node)
-                    ->expression.get());
+  switch(node->Type()){
+    case parser::ast::StatementType::LET:
+      return doEval(static_cast<parser::ast::LetStatement *>(node));
+    case parser::ast::StatementType::RETURN:
+      return doEval(static_cast<parser::ast::ReturnStatement *>(node));
+    case parser::ast::StatementType::EXPRESSION:
+      return doEval(static_cast<parser::ast::ExpressionStatement *>(node));
+    default:
+      return nullptr;
   }
-  return nullptr;
+}
+
+ObjectPtr Evaluator::doEval(parser::ast::ExpressionStatement *node) {
+  return eval(node->expression.get());
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::IntegerLiteral *node) {
@@ -129,9 +154,9 @@ ObjectPtr Evaluator::doEval(parser::ast::PrefixExpression *node) {
 ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node) {
   auto condition = eval(node->condition.get());
   if (isTruthy(condition)) {
-    return doEval(node->consequence.get());
+    return eval(node->consequence.get());
   } else if (node->alternative != nullptr) {
-    return doEval(node->alternative.get());
+    return eval(node->alternative.get());
   } else {
     return NullObject;
   }
@@ -150,11 +175,8 @@ ObjectPtr Evaluator::doEval(parser::ast::Identifier *node) { return nullptr; }
 ObjectPtr Evaluator::doEval(parser::ast::LetStatement *node) { return nullptr; }
 
 ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node) {
-  return nullptr;
-}
-
-ObjectPtr Evaluator::doEval(parser::ast::BlockStatement *node) {
-  return doEval(node->statements);
+    auto value = eval(node->returnValue.get());
+    return std::make_shared<ReturnValue>(value);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::Expression *node) {

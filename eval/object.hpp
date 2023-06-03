@@ -9,6 +9,9 @@ using OBJECT_TYPE = const char *;
 constexpr OBJECT_TYPE INTEGER_OBJ = "INTEGER";
 constexpr OBJECT_TYPE BOOLEAN_OBJ = "BOOLEAN";
 constexpr OBJECT_TYPE NULL_OBJ = "NULL";
+constexpr OBJECT_TYPE RETURN_VALUE_OBJ = "RETURN_VALUE";
+constexpr OBJECT_TYPE ERROR_OBJ = "ERROR";
+constexpr OBJECT_TYPE FUNCTION_OBJ = "FUNCTION";
 
 class Object {
 public:
@@ -44,6 +47,35 @@ public:
   std::string to_string() const override;
   std::string type() const override;
 };
+
+class ReturnValue : public Object {
+public:
+  explicit ReturnValue(ObjectPtr value);
+  ~ReturnValue() override = default;
+  std::string to_string() const override;
+  std::string type() const override;
+  ObjectPtr value_;
+};
+
+class Error : public Object {
+public:
+  explicit Error(std::string message);
+  ~Error() override = default;
+  std::string to_string() const override;
+  std::string type() const override;
+  std::string message_;
+};
+
+// class Function : public Object {
+// public:
+//   Function(std::vector<std::string> parameters, std::string body);
+//   ~Function() override = default;
+//   std::string to_string() const override;
+//   std::string type() const override;
+//   std::vector<std::string> parameters_;
+//   std::string body_;
+//   ObjectPtr env_;
+// };
 
 } // namespace evaluator
 } // namespace monkey
