@@ -1,8 +1,8 @@
 #pragma once
-#include <string>
-#include <memory>
-#include <unordered_map>
 #include "../parser/ast.hpp"
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace monkey {
 namespace evaluator {
@@ -69,8 +69,7 @@ public:
   std::string message_;
 };
 
-
-class EnvironmentImpl{
+class EnvironmentImpl {
 public:
   using Store = std::unordered_map<std::string, ObjectPtr>;
   struct StoreData {
@@ -80,8 +79,8 @@ public:
   explicit EnvironmentImpl();
   explicit EnvironmentImpl(std::shared_ptr<EnvironmentImpl> outer);
   ~EnvironmentImpl() = default;
-  StoreData get(const std::string& name);
-  ObjectPtr set(const std::string& name, ObjectPtr value);
+  StoreData get(const std::string &name);
+  ObjectPtr set(const std::string &name, ObjectPtr value);
   std::unordered_map<std::string, ObjectPtr> store_;
   std::shared_ptr<EnvironmentImpl> outer_;
 };
@@ -90,7 +89,8 @@ using Environment = std::shared_ptr<EnvironmentImpl>;
 
 class Function : public Object {
 public:
-  Function(parser::ast::Parameters params, std::unique_ptr<parser::ast::BlockStatement> body, Environment env);
+  Function(parser::ast::Parameters params,
+           std::unique_ptr<parser::ast::BlockStatement> body, Environment env);
   ~Function() override = default;
   std::string to_string() const override;
   std::string type() const override;

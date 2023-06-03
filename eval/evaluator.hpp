@@ -14,8 +14,7 @@ private:
   ObjectPtr evalProgram(const parser::ast::Statements &node, Environment env);
   ObjectPtr evalBlockStatement(const parser::ast::Statements &node,
                                Environment env);
-  Results evalExpressions(const parser::ast::Arguments &node,
-                          Environment env);
+  Results evalExpressions(const parser::ast::Arguments &node, Environment env);
   ObjectPtr applyFunction(ObjectPtr fn, const Results &args);
 
   ObjectPtr doEval(parser::ast::Statement *node, Environment env);
@@ -55,6 +54,5 @@ ObjectPtr Evaluator::eval(monkey::parser::ast::AstNode auto *node,
     std::cout << "evaluating node" << std::endl;
     return nullptr;
   }
-  return nullptr;
 }
 } // namespace monkey::evaluator

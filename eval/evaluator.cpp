@@ -31,7 +31,7 @@ ObjectPtr makeError(std::string message, Args... args) {
 }
 
 bool isError(ObjectPtr obj) {
-  if (obj != nullptr) {
+  if (obj != nullptr) { // TODO: is Null object an error too?
     return obj->type() == ERROR_OBJ;
   }
   return false;
@@ -109,7 +109,7 @@ ObjectPtr evalInfixExpression(const std::string &op, ObjectPtr left,
 
 ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node,
                                  Environment env) {
-  std::cout << "evaluating statements" << std::endl;
+  //   std::cout << "evaluating statements" << std::endl;
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
     result = eval(stmt.get(), env);
@@ -125,7 +125,7 @@ ObjectPtr Evaluator::evalProgram(const parser::ast::Statements &node,
 
 ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node,
                                         Environment env) {
-  std::cout << "evaluating block statement" << std::endl;
+  //   std::cout << "evaluating block statement" << std::endl;
   std::shared_ptr<Object> result;
   for (auto &stmt : node) {
     result = eval(stmt.get(), env);
@@ -140,7 +140,7 @@ ObjectPtr Evaluator::evalBlockStatement(const parser::ast::Statements &node,
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::Statement *node, Environment env) {
-  std::cout << "evaluating statement" << std::endl;
+  //   std::cout << "evaluating statement" << std::endl;
   switch (node->Type()) {
   case parser::ast::StatementType::LET:
     return doEval(static_cast<parser::ast::LetStatement *>(node), env);
@@ -205,55 +205,57 @@ ObjectPtr Evaluator::doEval(parser::ast::IfExpression *node, Environment env) {
 
 ObjectPtr Evaluator::doEval(parser::ast::FunctionLiteral *node,
                             Environment env) {
-    return std::make_shared<Function>(std::move(node->parameters), std::move(node->body), env);
+  return std::make_shared<Function>(std::move(node->parameters),
+                                    std::move(node->body), env);
 }
 
-Results Evaluator::evalExpressions(const parser::ast::Arguments &args, Environment env) {
-    std::vector<ObjectPtr> result;
-    for (auto &arg : args) {
-        auto evaluated = eval(arg.get(), env);
-        if (isError(evaluated)) {
-            return Results{evaluated};
-        }
-        result.push_back(evaluated);
+Results Evaluator::evalExpressions(const parser::ast::Arguments &args,
+                                   Environment env) {
+  std::vector<ObjectPtr> result;
+  for (auto &arg : args) {
+    auto evaluated = eval(arg.get(), env);
+    if (isError(evaluated)) {
+      return Results{evaluated};
     }
-    return result;
+    result.push_back(evaluated);
+  }
+  return result;
 }
 
 Environment extendFunctionEnv(Function *fn, const Results &args) {
-    auto env = new_enclosed_environment(fn->env_);
-    for (size_t i = 0; i < fn->parameters.size(); i++) {
-        env->set(fn->parameters[i]->value, args[i]);
-    }
-    return env;
+  auto env = new_enclosed_environment(fn->env_);
+  for (size_t i = 0; i < fn->parameters.size(); i++) {
+    env->set(fn->parameters[i]->value, args[i]);
+  }
+  return env;
 }
 
 ObjectPtr unwrapReturnValue(ObjectPtr obj) {
-    if (obj->type() == RETURN_VALUE_OBJ) {
-        return static_cast<ReturnValue*>(obj.get())->value_;
-    }
-    return obj;
+  if (obj->type() == RETURN_VALUE_OBJ) {
+    return static_cast<ReturnValue *>(obj.get())->value_;
+  }
+  return obj;
 }
 
-ObjectPtr Evaluator::applyFunction(ObjectPtr fn, const Results& args){
-    auto function = dynamic_cast<Function*>(fn.get());
-    std::cout << "applying function" << fn->to_string()<< std::endl;
-    auto extendedEnv = extendFunctionEnv(function, args);
-    auto evaluated = eval(function->body.get(), extendedEnv);
-    return unwrapReturnValue(evaluated);
+ObjectPtr Evaluator::applyFunction(ObjectPtr fn, const Results &args) {
+  auto function = dynamic_cast<Function *>(fn.get());
+  // std::cout << "applying function" << fn->to_string()<< std::endl;
+  auto extendedEnv = extendFunctionEnv(function, args);
+  auto evaluated = eval(function->body.get(), extendedEnv);
+  return unwrapReturnValue(evaluated);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::CallExpression *node,
                             Environment env) {
-    auto function = eval(node->function.get(), env);
-    if (isError(function)) {
-        return function;
-    }
-    auto args = evalExpressions(node->arguments, env);
-    if (args.size() == 1 && isError(args[0])) {
-        return args[0];
-    }
-    return applyFunction(function, args);
+  auto function = eval(node->function.get(), env);
+  if (isError(function)) {
+    return function;
+  }
+  auto args = evalExpressions(node->arguments, env);
+  if (args.size() == 1 && isError(args[0])) {
+    return args[0];
+  }
+  return applyFunction(function, args);
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment env) {
@@ -283,7 +285,7 @@ ObjectPtr Evaluator::doEval(parser::ast::ReturnStatement *node,
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::Expression *node, Environment env) {
-  std::cout << "evaluating expression" << (int)node->Type() << std::endl;
+  // std::cout << "evaluating expression" << (int)node->Type() << std::endl;
   switch (node->Type()) {
   case parser::ast::ExpressionType::IDENTIFIER:
     return doEval(static_cast<parser::ast::Identifier *>(node), env);

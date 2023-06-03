@@ -31,30 +31,32 @@ std::string Error::type() const { return ERROR_OBJ; }
 
 Error::Error(std::string message) : message_(std::move(message)) {}
 
-Function::Function(parser::ast::Parameters params, std::unique_ptr<parser::ast::BlockStatement> bod,
+Function::Function(parser::ast::Parameters params,
+                   std::unique_ptr<parser::ast::BlockStatement> bod,
                    Environment env)
     : parameters(std::move(params)), body(std::move(bod)),
       env_(std::move(env)) {}
 
 std::string Function::to_string() const {
-    std::ostringstream oss;
-    oss << "fn(";
-    for (auto it = parameters.begin(); it != parameters.end(); ++it) {
-        oss << (*it)->to_string();
-        if (std::next(it) != parameters.end()) {
-        oss << ", ";
-        }
+  std::ostringstream oss;
+  oss << "fn(";
+  for (auto it = parameters.begin(); it != parameters.end(); ++it) {
+    oss << (*it)->to_string();
+    if (std::next(it) != parameters.end()) {
+      oss << ", ";
     }
-    oss << ") {\n";
-    oss << body->to_string();
-    oss << "\n}";
-    return oss.str();
+  }
+  oss << ") {\n";
+  oss << body->to_string();
+  oss << "\n}";
+  return oss.str();
 }
 
 std::string Function::type() const { return FUNCTION_OBJ; }
 
 EnvironmentImpl::EnvironmentImpl() : outer_(nullptr) {}
-EnvironmentImpl::EnvironmentImpl(std::shared_ptr<EnvironmentImpl> outer) : outer_(std::move(outer)) {}
+EnvironmentImpl::EnvironmentImpl(std::shared_ptr<EnvironmentImpl> outer)
+    : outer_(std::move(outer)) {}
 
 Environment new_enclosed_environment(Environment outer) {
   return std::make_shared<EnvironmentImpl>(std::move(outer));
@@ -66,15 +68,13 @@ EnvironmentImpl::StoreData EnvironmentImpl::get(const std::string &name) {
 
   if (it != store_.end()) {
     return StoreData{.value = it->second, .found = true};
-  }
-  else if (outer_ != nullptr) {
-      return outer_->get(name);
+  } else if (outer_ != nullptr) {
+    return outer_->get(name);
   }
   return StoreData{.value = nullptr, .found = false};
-
 }
 
- ObjectPtr EnvironmentImpl::set(const std::string &name, ObjectPtr value) {
+ObjectPtr EnvironmentImpl::set(const std::string &name, ObjectPtr value) {
   store_.insert_or_assign(name, value);
   return value;
 }
