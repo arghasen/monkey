@@ -1,12 +1,13 @@
 #pragma once
 #include "../parser/ast.hpp"
+#include "builtins.hpp"
 #include "object.hpp"
 #include <iostream>
 
 namespace monkey::evaluator {
 class Evaluator {
 public:
-  Evaluator() = default;
+  Evaluator();
   ~Evaluator() = default;
   ObjectPtr eval(monkey::parser::ast::AstNode auto *node, Environment env);
 
@@ -16,6 +17,8 @@ private:
                                Environment env);
   Results evalExpressions(const parser::ast::Arguments &node, Environment env);
   ObjectPtr applyFunction(ObjectPtr fn, const Results &args);
+  ObjectPtr applyFunction(Function *fn, const Results &args);
+  ObjectPtr applyBuiltin(Builtin *fn, const Results &args);
 
   ObjectPtr doEval(parser::ast::Statement *node, Environment env);
   ObjectPtr doEval(parser::ast::Expression *node, Environment env);
@@ -31,6 +34,8 @@ private:
   ObjectPtr doEval(parser::ast::ReturnStatement *node, Environment env);
   ObjectPtr doEval(parser::ast::ExpressionStatement *node, Environment env);
   ObjectPtr doEval(parser::ast::StringLiteral *node, Environment env);
+
+  Builtins builtins;
 };
 
 ObjectPtr Evaluator::eval(monkey::parser::ast::AstNode auto *node,

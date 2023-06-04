@@ -1,10 +1,11 @@
 #pragma once
 #include "../parser/ast.hpp"
+#include <functional>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <functional>
 
 namespace monkey {
 namespace evaluator {
@@ -119,9 +120,21 @@ public:
   ~Builtin() override = default;
   std::string to_string() const override;
   std::string type() const override;
+  Fn::result_type operator()(Fn::argument_type args) const;
+
+private:
   Fn fn_;
 };
 
 Environment new_enclosed_environment(Environment outer);
+
+template <typename... Args>
+ObjectPtr makeError(std::string message, Args... args) {
+  std::ostringstream oss;
+  oss << message;
+  ((oss << " " << args), ...);
+  return std::make_shared<Error>(oss.str());
+}
+
 } // namespace evaluator
 } // namespace monkey

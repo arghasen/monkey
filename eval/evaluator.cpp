@@ -1,4 +1,5 @@
 #include "evaluator.hpp"
+#include "builtins.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -7,6 +8,8 @@ namespace monkey::evaluator {
 const static auto TRUE = std::make_shared<Boolean>(true);
 const static auto FALSE = std::make_shared<Boolean>(false);
 const static auto NullObject = std::make_shared<Null>();
+
+Evaluator::Evaluator() : builtins(create_builtins()) {}
 
 bool isTruthy(ObjectPtr obj) {
   if (obj == NullObject) {
@@ -21,14 +24,6 @@ bool isTruthy(ObjectPtr obj) {
 }
 
 ObjectPtr getBoolean(bool value) { return value ? TRUE : FALSE; }
-
-template <typename... Args>
-ObjectPtr makeError(std::string message, Args... args) {
-  std::ostringstream oss;
-  oss << message;
-  ((oss << " " << args), ...);
-  return std::make_shared<Error>(oss.str());
-}
 
 bool isError(ObjectPtr obj) {
   if (obj != nullptr) { // TODO: is Null object an error too?
@@ -254,12 +249,25 @@ ObjectPtr unwrapReturnValue(ObjectPtr obj) {
   return obj;
 }
 
-ObjectPtr Evaluator::applyFunction(ObjectPtr fn, const Results &args) {
-  auto function = dynamic_cast<Function *>(fn.get());
-  // std::cout << "applying function" << fn->to_string()<< std::endl;
-  auto extendedEnv = extendFunctionEnv(function, args);
-  auto evaluated = eval(function->body.get(), extendedEnv);
+ObjectPtr Evaluator::applyFunction(Function *fn, const Results &args) {
+  auto extendedEnv = extendFunctionEnv(fn, args);
+  auto evaluated = eval(fn->body.get(), extendedEnv);
   return unwrapReturnValue(evaluated);
+}
+
+ObjectPtr Evaluator::applyBuiltin(Builtin *fn, const Results &args) {
+  return fn->operator()(args);
+}
+
+ObjectPtr Evaluator::applyFunction(ObjectPtr fn, const Results &args) {
+  auto fnType = fn->type();
+  if (fnType == FUNCTION_OBJ) {
+    return applyFunction(static_cast<Function *>(fn.get()), args);
+  } else if (fnType == BUILTIN_OBJ) {
+    return applyBuiltin(static_cast<Builtin *>(fn.get()), args);
+  } else {
+    return makeError("not a function", fn->to_string());
+  }
 }
 
 ObjectPtr Evaluator::doEval(parser::ast::CallExpression *node,
@@ -279,6 +287,11 @@ ObjectPtr Evaluator::doEval(parser::ast::Identifier *node, Environment env) {
   auto value = env->get(node->value);
   if (value.found) {
     return value.value;
+  }
+
+  auto builtin = builtins.find(node->value);
+  if (builtin != builtins.end()) {
+    return builtin->second;
   }
   return makeError("identifier not found:", node->value);
 }

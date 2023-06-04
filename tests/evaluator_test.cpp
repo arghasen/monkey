@@ -4,6 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <optional>
+#include <variant>
 
 using namespace monkey::evaluator;
 
@@ -253,4 +254,43 @@ BOOST_AUTO_TEST_CASE(TestStringConcatenation) {
   BOOST_CHECK_EQUAL(evaluated->type(), STRING_OBJ);
   auto str = dynamic_cast<const String *>(evaluated.get());
   BOOST_CHECK_EQUAL(str->value_, "Hello World!");
+}
+
+BOOST_AUTO_TEST_CASE(TestBuiltinFunctions){
+    struct Test {
+        std::string input;
+        std::variant<int64_t,std::string> expected;
+    };
+
+    std::vector<Test> tests = {
+        {R"(len(""))", 0},
+        {R"(len("four"))", 4},
+        {R"(len("hello world"))", 11},
+        {R"(len(1))", "argument to `len` not supported, got INTEGER"},
+        {R"(len("one", "two"))", "wrong number of arguments. want=1, got= 2"},
+        // {R"(len([1, 2, 3]))", 3},
+        // {R"(len([]))", 0},
+        // {R"(puts("hello", "world!"))", "hello\nworld!\n"},
+        // {R"(first([1, 2, 3]))", 1},
+        // {R"(first([]))", nullptr},
+        // {R"(first(1))", "argument to `first` must be ARRAY, got INTEGER"},
+        // {R"(last([1, 2, 3]))", 3},
+        // {R"(last([]))", nullptr},
+        // {R"(last(1))", "argument to `last` must be ARRAY, got INTEGER"},
+        // {R"(rest([1, 2, 3]))", std::vector<int64_t>{2, 3}},
+        // {R"(rest([]))", nullptr},
+        // {R"(push([], 1))", std::vector<int64_t>{1}},
+        // {R"(push(1, 1))", "argument to `push` must be ARRAY, got INTEGER"},
+    };
+
+    for (auto &[input, expected] : tests) {
+        auto evaluated = testEval(input);
+        if (std::holds_alternative<int64_t>(expected)) {
+            testIntegerObject(*evaluated, std::get<int64_t>(expected));
+        } else {
+            BOOST_CHECK_EQUAL(evaluated->type(), ERROR_OBJ);
+            BOOST_CHECK_EQUAL(dynamic_cast<const Error &>(*evaluated).message_,
+                            std::get<std::string>(expected));
+        }
+    }
 }
