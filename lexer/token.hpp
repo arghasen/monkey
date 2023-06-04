@@ -45,7 +45,7 @@ enum class TokenType {
   FALSE,
   IF,
   ELSE,
-  RETURN
+  RETURN,
 };
 
 struct Token {

@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <functional>
 
 namespace monkey {
 namespace evaluator {
@@ -15,6 +17,7 @@ constexpr OBJECT_TYPE RETURN_VALUE_OBJ = "RETURN_VALUE";
 constexpr OBJECT_TYPE ERROR_OBJ = "ERROR";
 constexpr OBJECT_TYPE FUNCTION_OBJ = "FUNCTION";
 constexpr OBJECT_TYPE STRING_OBJ = "STRING";
+constexpr OBJECT_TYPE BUILTIN_OBJ = "BUILTIN";
 
 class Object {
 public:
@@ -107,6 +110,16 @@ public:
   std::string to_string() const override;
   std::string type() const override;
   std::string value_;
+};
+
+class Builtin : public Object {
+public:
+  using Fn = std::function<ObjectPtr(Results)>;
+  explicit Builtin(Fn fn);
+  ~Builtin() override = default;
+  std::string to_string() const override;
+  std::string type() const override;
+  Fn fn_;
 };
 
 Environment new_enclosed_environment(Environment outer);

@@ -21,6 +21,43 @@ void testLetStatement(Statement* s, std::string name){
   BOOST_REQUIRE_EQUAL(letStmt->name->TokenLiteral(), name);
 }
 
+void testIntegerLiteral(ast::Expression* expr, int64_t value){
+  auto literal = getAs<ast::IntegerLiteral>(expr);
+  BOOST_REQUIRE_EQUAL(literal->value, value);
+  BOOST_REQUIRE_EQUAL(literal->TokenLiteral(), std::to_string(value));
+}
+
+void testIdentifier(ast::Expression* expr, std::string value){
+  auto ident = getAs<ast::Identifier>(expr);
+  BOOST_REQUIRE_EQUAL(ident->value, value);
+  BOOST_REQUIRE_EQUAL(ident->TokenLiteral(), value);
+}
+
+void testBooleanLiteral(ast::Expression* expr, bool value){
+  auto boolean = getAs<ast::Boolean>(expr);
+  BOOST_REQUIRE_EQUAL(boolean->value, value);
+  BOOST_REQUIRE_EQUAL(boolean->TokenLiteral(), std::to_string(value));
+}
+
+void testLiteralExpression(ast::Expression* expr, auto expected){
+  if constexpr(std::is_same_v<decltype(expected), int64_t>){
+    testIntegerLiteral(expr, expected);
+  } else if constexpr(std::is_same_v<decltype(expected), std::string>){
+    testIdentifier(expr, expected);
+  } else if constexpr(std::is_same_v<decltype(expected), bool>){
+    testBooleanLiteral(expr, expected);
+  } else {
+    BOOST_FAIL("type of expr not handled. Got " + std::string(typeid(expr).name()));
+  }
+}
+
+void testInfixExpression(InfixExpression* expr, auto left, std::string op, auto right){
+    BOOST_REQUIRE_EQUAL(expr->op, op);
+    BOOST_REQUIRE_EQUAL(expr->TokenLiteral(), op);
+    testLiteralExpression(expr->left.get(), left);
+    testLiteralExpression(expr->right.get(), right);
+}
+
 void checkParserErrors(Parser& p){
   auto errors = p.getErrors();
   if(errors.empty()){
@@ -31,6 +68,16 @@ void checkParserErrors(Parser& p){
     BOOST_ERROR("parser error: " + error);
   }
   BOOST_FAIL("parser has " + std::to_string(errors.size()) + " errors");
+}
+
+std::unique_ptr<ast::Program> testProgram(std::string input){
+  monkey::lexer::Lexer l(input);
+  Parser p(&l);
+  auto program = p.parseProgram();
+  checkParserErrors(p);
+  BOOST_REQUIRE_NE(program, nullptr);
+  BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
+  return program;
 }
 
 BOOST_AUTO_TEST_CASE(TestLetStatements) {
@@ -63,11 +110,12 @@ BOOST_AUTO_TEST_CASE(TestLetStatements) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestLetStatementsFailures) {
+BOOST_AUTO_TEST_CASE(TestParseFailures) {
   auto input = R"(
         let failure;
         let anotherFailure 123;
         let  = 456;
+        {"1,2",""}
     )";
 
   monkey::lexer::Lexer l(input);
@@ -75,7 +123,7 @@ BOOST_AUTO_TEST_CASE(TestLetStatementsFailures) {
 
   auto program = p.parseProgram();
   BOOST_REQUIRE_NE(program, nullptr);
-  BOOST_REQUIRE_EQUAL(p.getErrors().size(), 5); // TODO: assign, semicolon extra expecting to get parsed
+  BOOST_REQUIRE_EQUAL(p.getErrors().size(), 8); // TODO: assign, semicolon extra expecting to get parsed
 }
 
 BOOST_AUTO_TEST_CASE(TestReturnStatements){
@@ -169,15 +217,15 @@ BOOST_AUTO_TEST_CASE(TestParsingPrefixExpressions){
 
 BOOST_AUTO_TEST_CASE(TestParsingInfixExpressions){
 
-  std::vector<std::tuple<std::string,std::string,std::string, std::string>> tests = {
-    {"5+5;","5","+","5"},
-    {"5-5","5","-","5"},
-    {"5*5","5","*","5"},
-    {"5/5","5","/","5"},
-    {"5>5","5",">","5"},
-    {"5<5","5","<","5"},
-    {"5==5","5","==","5"},
-    {"5!=5","5","!=","5"},
+  std::vector<std::tuple<std::string,int64_t,std::string, int64_t>> tests = {
+    {"5+5;",5,"+",5},
+    {"5-5;",5,"-",5},
+    {"5*5;",5,"*",5},
+    {"5/5;",5,"/",5},
+    {"5>5;",5,">",5},
+    {"5<5;",5,"<",5},
+    {"5==5;",5,"==",5},
+    {"5!=5;",5,"!=",5},
     // {"foobar + barfoo;", "foobar", "+", "barfoo"},
 		// {"foobar - barfoo;", "foobar", "-", "barfoo"},
 		// {"foobar * barfoo;", "foobar", "*", "barfoo"},
@@ -191,26 +239,16 @@ BOOST_AUTO_TEST_CASE(TestParsingInfixExpressions){
 		// {"false == false", false, "==", false},
   };
 
-  for(auto [input, expectedLeft, expectedOp, expectedRight ]:tests){
-    monkey::lexer::Lexer l(input);
-    Parser p(&l);
-    auto program = p.parseProgram();
-    checkParserErrors(p);
-    BOOST_REQUIRE_NE(program, nullptr);
-    BOOST_REQUIRE_EQUAL(program->statements.size(), 1);
-    auto stmt = program->statements[0].get();
-    auto exprStmt = getAs<ExpressionStatement>(stmt);
-    auto infixExpr = getAs<InfixExpression>(exprStmt->expression.get());
-    BOOST_REQUIRE_EQUAL(infixExpr->op, expectedOp);
-    BOOST_REQUIRE_EQUAL(infixExpr->TokenLiteral(), expectedOp);
-    auto left = getAs<IntegerLiteral>(infixExpr->left.get());
-    BOOST_REQUIRE_EQUAL(left->value,std::stoi(expectedLeft));
-    BOOST_REQUIRE_EQUAL(left->TokenLiteral(), expectedLeft);
-    auto right = getAs<IntegerLiteral>(infixExpr->right.get());
-    BOOST_REQUIRE_EQUAL(right->value, std::stoi(expectedRight));
-    BOOST_REQUIRE_EQUAL(right->TokenLiteral(), expectedRight);
-  }
+  auto doTest = [](){
 
+  };
+      for(auto [input, expectedLeft, expectedOp, expectedRight ]:tests){
+      auto program = testProgram(input);
+      auto stmt = program->statements[0].get();
+      auto exprStmt = getAs<ExpressionStatement>(stmt);
+      auto infixExpr = getAs<InfixExpression>(exprStmt->expression.get());
+      testInfixExpression(infixExpr, expectedLeft, expectedOp, expectedRight);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing){

@@ -78,9 +78,8 @@ std::string to_string(TokenType tok) {
     return "RETURN";
   case TokenType::STRING:
     return "STRING";
-  default:
-    return "";
   }
+  return "UNKNOWN";
 }
 
 std::ostream &operator<<(std::ostream &os, TokenType tok) {

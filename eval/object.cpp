@@ -83,5 +83,11 @@ String::String(std::string value) : value_(std::move(value)) {}
 
 std::string String::to_string() const { return value_; }
 
-std::string String::type() const { return STRING_OBJ; }
+std::string String::type() const { return STRING_OBJ; } 
+
+Builtin::Builtin(Fn fn) : fn_(std::move(fn)) {}
+
+std::string Builtin::to_string() const { return "builtin function"; }
+
+std::string Builtin::type() const { return BUILTIN_OBJ; }
 } // namespace monkey::evaluator
