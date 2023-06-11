@@ -2,8 +2,7 @@
 #include "token.hpp"
 #include <cctype>
 
-namespace monkey {
-namespace lexer {
+namespace monkey::lexer {
 
 Lexer::Lexer(const std::string &input)
     : input_(input), position_(0), read_position_(0), ch_('\0') {
@@ -13,7 +12,7 @@ Lexer::Lexer(const std::string &input)
 void Lexer::readChar() {
   if (read_position_ >= input_.length()) {
     ch_ = '\0';
-  } else {
+  } else [[likely]]{
     ch_ = input_[read_position_];
   }
   position_ = read_position_;
@@ -29,74 +28,57 @@ lexer::Token Lexer::nextToken() {
   case '=':
     if (peekChar() == '=') {
       readChar();
-      tok.type = TokenType::EQ;
-      tok.literal = "==";
+      tok = Token(TokenType::EQ, "==");
     } else {
-      tok.type = TokenType::ASSIGN;
-      tok.literal = "=";
+     tok = Token(TokenType::ASSIGN, "=");
     }
     break;
   case '+':
-    tok.type = TokenType::PLUS;
-    tok.literal = "+";
+    tok = Token(TokenType::PLUS, "+");
     break;
   case '-':
-    tok.type = TokenType::MINUS;
-    tok.literal = "-";
+    tok = Token(TokenType::MINUS, "-");
     break;
   case '!':
     if (peekChar() == '=') {
       readChar();
-      tok.type = TokenType::NOT_EQ;
-      tok.literal = "!=";
+      tok = Token(TokenType::NOT_EQ, "!=");
     } else {
-      tok.type = TokenType::BANG;
-      tok.literal = "!";
+        tok = Token(TokenType::BANG, "!");
     }
     break;
   case '/':
-    tok.type = TokenType::SLASH;
-    tok.literal = "/";
+    tok = Token(TokenType::SLASH, "/");
     break;
   case '*':
-    tok.type = TokenType::ASTERISK;
-    tok.literal = "*";
+    tok = Token(TokenType::ASTERISK, "*");
     break;
   case '<':
-    tok.type = TokenType::LT;
-    tok.literal = "<";
+    tok = Token(TokenType::LT, "<");
     break;
   case '>':
-    tok.type = TokenType::GT;
-    tok.literal = ">";
+    tok = Token(TokenType::GT, ">");
     break;
   case ';':
-    tok.type = TokenType::SEMICOLON;
-    tok.literal = ";";
+    tok = Token(TokenType::SEMICOLON, ";");
     break;
   case '(':
-    tok.type = TokenType::LPAREN;
-    tok.literal = "(";
+    tok = Token(TokenType::LPAREN, "(");
     break;
   case ')':
-    tok.type = TokenType::RPAREN;
-    tok.literal = ")";
+    tok = Token(TokenType::RPAREN, ")");
     break;
   case ',':
-    tok.type = TokenType::COMMA;
-    tok.literal = ",";
+    tok = Token(TokenType::COMMA, ",");
     break;
   case '{':
-    tok.type = TokenType::LBRACE;
-    tok.literal = "{";
+    tok = Token(TokenType::LBRACE, "{");
     break;
   case '}':
-    tok.type = TokenType::RBRACE;
-    tok.literal = "}";
+    tok = Token(TokenType::RBRACE, "}");
     break;
   case '\0':
-    tok.type = TokenType::EOFILE;
-    tok.literal = "";
+    tok = Token(TokenType::EOFILE, "");
     break;
   case '"':
     tok.type = TokenType::STRING;
@@ -158,5 +140,4 @@ char Lexer::peekChar() {
     return input_[read_position_];
   }
 }
-} // namespace lexer
-} // namespace monkey
+} // namespace monkey::lexer

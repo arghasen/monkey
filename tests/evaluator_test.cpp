@@ -146,7 +146,6 @@ BOOST_AUTO_TEST_CASE(TestEvalReturnStatements) {
 
   for (auto &[input, expected] : tests) {
     auto evaluated = testEval(input);
-    // std::cout << (*evaluated).type() << std::endl;
     testIntegerObject(*evaluated, expected);
   }
 }

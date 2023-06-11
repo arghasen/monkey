@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
       {TokenType::ASSIGN, "="},    {TokenType::IDENT, "add"},
       {TokenType::LPAREN, "("},    {TokenType::IDENT, "five"},
       {TokenType::COMMA, ","},     {TokenType::IDENT, "ten"},
-      {TokenType::RPAREN, ")"},    {TokenType::SEMICOLON, ";"},
+      {TokenType::RPAREN, ")"},    {TokenType::SEMICOLON, ";"}
   };
 
   monkey::lexer::Lexer lexer(input);
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(TestTokenCheckConversionToString) {
       {TokenType::SLASH, "SLASH"},
       {TokenType::COMMA, "COMMA"},
       {TokenType::TRUE, "TRUE"},
-      {TokenType::FALSE, "FALSE"},
+      {TokenType::FALSE, "FALSE"}
   };
 
   for (auto &[tokenType, expectedString] : testResults) {

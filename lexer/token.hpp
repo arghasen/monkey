@@ -3,8 +3,7 @@
 #include <cstdint>
 #include <string>
 
-namespace monkey {
-namespace lexer {
+namespace monkey::lexer {
 
 enum class TokenType {
 
@@ -62,5 +61,4 @@ std::string to_string(TokenType tok);
 std::ostream &operator<<(std::ostream &os, const Token &tok);
 std::ostream &operator<<(std::ostream &os, TokenType tok);
 
-} // namespace lexer
-} // namespace monkey
+} // namespace monkey::lexer
