@@ -4,6 +4,16 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace monkey::lexer;
+
+void checkTokens(std::string input, std::vector<Token> expectedTokens) {
+  monkey::lexer::Lexer lexer(input);
+
+  for (auto &expectedToken : expectedTokens) {
+    auto tok = lexer.nextToken();
+    BOOST_CHECK_EQUAL(tok, expectedToken);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(TestNextToken) {
   auto input = "=+(){},;";
 
@@ -13,14 +23,7 @@ BOOST_AUTO_TEST_CASE(TestNextToken) {
       {TokenType::LBRACE, "{"}, {TokenType::RBRACE, "}"},
       {TokenType::COMMA, ","},  {TokenType::SEMICOLON, ";"},
       {TokenType::EOFILE, ""}};
-
-  monkey::lexer::Lexer lexer(input);
-
-  for (auto &[expectedType, expectedLiteral] : testResults) {
-    auto tok = lexer.nextToken();
-    BOOST_CHECK_EQUAL(tok.type, expectedType);
-    BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
-  }
+  checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestNextToken2) {
@@ -51,15 +54,8 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
       {TokenType::ASSIGN, "="},    {TokenType::IDENT, "add"},
       {TokenType::LPAREN, "("},    {TokenType::IDENT, "five"},
       {TokenType::COMMA, ","},     {TokenType::IDENT, "ten"},
-      {TokenType::RPAREN, ")"},    {TokenType::SEMICOLON, ";"}
-  };
-
-  monkey::lexer::Lexer lexer(input);
-  for (auto &[expectedType, expectedLiteral] : testResults) {
-    auto tok = lexer.nextToken();
-    BOOST_CHECK_EQUAL(tok.type, expectedType);
-    BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
-  }
+      {TokenType::RPAREN, ")"},    {TokenType::SEMICOLON, ";"}};
+  checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestNextTokenOperators) {
@@ -83,12 +79,7 @@ BOOST_AUTO_TEST_CASE(TestNextTokenOperators) {
       {TokenType::INT, "9"},   {TokenType::SEMICOLON, ";"},
       {TokenType::EOFILE, ""}};
 
-  monkey::lexer::Lexer lexer(input);
-  for (auto &[expectedType, expectedLiteral] : testResults) {
-    auto tok = lexer.nextToken();
-    BOOST_CHECK_EQUAL(tok.type, expectedType);
-    BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
-  }
+  checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
@@ -111,12 +102,7 @@ BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
       {TokenType::FALSE, "false"}, {TokenType::SEMICOLON, ";"},
       {TokenType::RBRACE, "}"},    {TokenType::EOFILE, ""}};
 
-  monkey::lexer::Lexer lexer(input);
-  for (auto &[expectedType, expectedLiteral] : testResults) {
-    auto tok = lexer.nextToken();
-    BOOST_CHECK_EQUAL(tok.type, expectedType);
-    BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
-  }
+  checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestNextTokenString) {
@@ -129,12 +115,7 @@ BOOST_AUTO_TEST_CASE(TestNextTokenString) {
                                     {TokenType::STRING, "foo bar"},
                                     {TokenType::EOFILE, ""}};
 
-  monkey::lexer::Lexer lexer(input);
-  for (auto &[expectedType, expectedLiteral] : testResults) {
-    auto tok = lexer.nextToken();
-    BOOST_CHECK_EQUAL(tok.type, expectedType);
-    BOOST_CHECK_EQUAL(tok.literal, expectedLiteral);
-  }
+  checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestTokenCheckConversionToString) {
@@ -169,8 +150,7 @@ BOOST_AUTO_TEST_CASE(TestTokenCheckConversionToString) {
       {TokenType::SLASH, "SLASH"},
       {TokenType::COMMA, "COMMA"},
       {TokenType::TRUE, "TRUE"},
-      {TokenType::FALSE, "FALSE"}
-  };
+      {TokenType::FALSE, "FALSE"}};
 
   for (auto &[tokenType, expectedString] : testResults) {
     BOOST_CHECK_EQUAL(to_string(tokenType), expectedString);

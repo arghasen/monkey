@@ -10,12 +10,10 @@ enum class TokenType {
   // constants
   ILLEGAL,
   EOFILE,
-
   // Identifiers + literals
   IDENT,
   INT,
   STRING,
-
   // operators
   ASSIGN,
   PLUS,
@@ -27,16 +25,13 @@ enum class TokenType {
   GT,
   EQ,
   NOT_EQ,
-
   // delimiters
   COMMA,
   SEMICOLON,
-
   LPAREN,
   RPAREN,
   LBRACE,
   RBRACE,
-
   // keywords
   FUNCTION,
   LET,
@@ -48,11 +43,14 @@ enum class TokenType {
 };
 
 struct Token {
-  TokenType type;
-  std::string literal;
   Token() = default;
   constexpr Token(TokenType type, std::string_view literal)
       : type(type), literal(literal){};
+  bool operator==(const Token &rhs) const {
+    return type == rhs.type && literal == rhs.literal;
+  }
+  TokenType type;
+  std::string literal;
 };
 
 TokenType LookupIdent(const std::string &ident);
