@@ -68,8 +68,9 @@ private:
   Expression parseFunctionLiteral();
   ast::Parameters parseFunctionParameters();
   Expression parseCallExpression(Expression function);
-  ast::Arguments parseCallArguments();
   Expression parseStringLiteral();
+  Expression parseArrayLiteral();
+  ast::Arguments parseExpressionList(lexer::TokenType end);
 
   void noPrefixParseFnError(lexer::TokenType type);
 

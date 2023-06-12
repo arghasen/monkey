@@ -156,3 +156,20 @@ BOOST_AUTO_TEST_CASE(TestTokenCheckConversionToString) {
     BOOST_CHECK_EQUAL(to_string(tokenType), expectedString);
   }
 }
+
+BOOST_AUTO_TEST_CASE(TestArray){
+    auto input = R"(
+        [1, 2];
+        )";
+    
+    std::vector<Token> testResults = {
+        {TokenType::LBRACKET, "["},
+        {TokenType::INT, "1"},
+        {TokenType::COMMA, ","},
+        {TokenType::INT, "2"},
+        {TokenType::RBRACKET, "]"},
+        {TokenType::SEMICOLON, ";"},
+        {TokenType::EOFILE, ""}};
+    
+    checkTokens(input, testResults);
+}

@@ -19,6 +19,7 @@ Parser::Parser(lexer::Lexer *l) : l(l) {
   registerPrefix(lexer::TokenType::IF, &Parser::parseIfExpression);
   registerPrefix(lexer::TokenType::FUNCTION, &Parser::parseFunctionLiteral);
   registerPrefix(lexer::TokenType::STRING, &Parser::parseStringLiteral);
+  registerPrefix(lexer::TokenType::LBRACKET, &Parser::parseArrayLiteral);
 
   registerInfix(lexer::TokenType::PLUS, &Parser::parseInfixExpression);
   registerInfix(lexer::TokenType::MINUS, &Parser::parseInfixExpression);
@@ -247,31 +248,37 @@ Expression Parser::parseFunctionLiteral() {
 Expression Parser::parseCallExpression(Expression function) {
   auto expression = std::make_unique<ast::CallExpression>(curToken);
   expression->function = std::move(function);
-  expression->arguments = parseCallArguments();
+  expression->arguments = parseExpressionList(lexer::TokenType::RPAREN);
   return expression;
-}
-
-ast::Arguments Parser::parseCallArguments() {
-  ast::Arguments arguments;
-  if (peekTokenIs(lexer::TokenType::RPAREN)) {
-    nextToken();
-    return arguments;
-  }
-  nextToken();
-  arguments.push_back(parseExpression(Precedence::LOWEST));
-  while (peekTokenIs(lexer::TokenType::COMMA)) {
-    nextToken();
-    nextToken();
-    arguments.push_back(parseExpression(Precedence::LOWEST));
-  }
-  if (!expectPeek(lexer::TokenType::RPAREN)) {
-    return {};
-  }
-  return arguments;
 }
 
 Expression Parser::parseStringLiteral() {
   return std::make_unique<ast::StringLiteral>(curToken);
+}
+
+Expression Parser::parseArrayLiteral() {
+  auto arrayLiteral = std::make_unique<ast::ArrayLiteral>(curToken);
+  arrayLiteral->elements = parseExpressionList(lexer::TokenType::RBRACKET);
+  return arrayLiteral;
+}
+
+ast::Arguments Parser::parseExpressionList(lexer::TokenType end) {
+  ast::Arguments list;
+  if (peekTokenIs(end)) {
+    nextToken();
+    return list;
+  }
+  nextToken();
+  list.push_back(parseExpression(Precedence::LOWEST));
+  while (peekTokenIs(lexer::TokenType::COMMA)) {
+    nextToken(); // skip comma
+    nextToken();
+    list.push_back(parseExpression(Precedence::LOWEST));
+  }
+  if (!expectPeek(end)) {
+    return {};
+  }
+  return list;
 }
 
 bool Parser::curTokenIs(lexer::TokenType type) { return curToken.type == type; }

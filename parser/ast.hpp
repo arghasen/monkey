@@ -31,6 +31,7 @@ enum class ExpressionType {
   FUNCTION,
   CALL,
   STRING,
+  ARRAY,
 };
 
 class Node {
@@ -46,7 +47,7 @@ protected:
 class Statement : public Node {
 public:
   virtual ~Statement() = default;
-  virtual std::string to_string() const = 0;
+  std::string to_string() const override = 0;
   std::string TokenLiteral() const override;
   lexer::Token token;
   constexpr virtual StatementType Type() const = 0;
@@ -80,7 +81,6 @@ public:
 
 class Identifier : public Expression {
 public:
-  Identifier() = default;
   explicit Identifier(lexer::Token tok);
   ~Identifier() override = default;
   std::string to_string() const override;
@@ -109,7 +109,6 @@ public:
 
 class ExpressionStatement : public Statement {
 public:
-  ExpressionStatement() = default;
   explicit ExpressionStatement(lexer::Token tok);
   ~ExpressionStatement() override = default;
   std::string to_string() const override;
@@ -202,6 +201,16 @@ public:
   constexpr ExpressionType Type() const override;
   std::string value;
 };
+
+class ArrayLiteral : public Expression {
+public:
+  explicit ArrayLiteral(lexer::Token tok);
+  ~ArrayLiteral() override = default;
+  std::string to_string() const override;
+  constexpr ExpressionType Type() const override;
+  Arguments elements;
+};
+
 
 template <typename T>
 concept AstNode = std::is_base_of<ast::Node, T>::value;

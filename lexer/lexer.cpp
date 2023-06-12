@@ -12,7 +12,7 @@ Lexer::Lexer(const std::string &input)
 void Lexer::readChar() {
   if (read_position_ >= input_.length()) {
     ch_ = '\0';
-  } else [[likely]]{
+  } else [[likely]] {
     ch_ = input_[read_position_];
   }
   position_ = read_position_;
@@ -30,7 +30,7 @@ lexer::Token Lexer::nextToken() {
       readChar();
       tok = Token(TokenType::EQ, "==");
     } else {
-     tok = Token(TokenType::ASSIGN, "=");
+      tok = Token(TokenType::ASSIGN, "=");
     }
     break;
   case '+':
@@ -44,7 +44,7 @@ lexer::Token Lexer::nextToken() {
       readChar();
       tok = Token(TokenType::NOT_EQ, "!=");
     } else {
-        tok = Token(TokenType::BANG, "!");
+      tok = Token(TokenType::BANG, "!");
     }
     break;
   case '/':
@@ -76,6 +76,12 @@ lexer::Token Lexer::nextToken() {
     break;
   case '}':
     tok = Token(TokenType::RBRACE, "}");
+    break;
+  case '[':
+    tok = Token(TokenType::LBRACKET, "[");
+    break;
+  case ']':
+    tok = Token(TokenType::RBRACKET, "]");
     break;
   case '\0':
     tok = Token(TokenType::EOFILE, "");

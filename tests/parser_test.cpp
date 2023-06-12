@@ -194,7 +194,6 @@ BOOST_AUTO_TEST_CASE(TestParsingInfixExpressions) {
           {"true != false", true, "!=", false},
           {"false == false", false, "==", false},
       };
-
   auto testInfix = [](auto infixExpr, auto left, auto op, auto right) {
     if (std::holds_alternative<int64_t>(left) &&
         std::holds_alternative<int64_t>(right)) {
@@ -384,4 +383,18 @@ BOOST_AUTO_TEST_CASE(TestStringLiteral) {
   auto exprStmt = getAs<ExpressionStatement>(stmt);
   auto literal = getAs<StringLiteral>(exprStmt->expression.get());
   BOOST_REQUIRE_EQUAL(literal->value, "hello world");
+}
+
+BOOST_AUTO_TEST_CASE(TestArrayLiterals){
+    std::string input = "[1, 2 * 2, 3 + 3]";
+    auto program = testProgram(input);
+    auto stmt = program->statements[0].get();
+    auto exprStmt = getAs<ExpressionStatement>(stmt);
+    auto array = getAs<ArrayLiteral>(exprStmt->expression.get());
+    BOOST_REQUIRE_EQUAL(array->elements.size(), 3);
+    testIntegerLiteral(array->elements[0].get(), 1);
+    auto arg1 = getAs<InfixExpression>(array->elements[1].get());
+    testInfixExpression(arg1, int64_t(2), "*", int64_t(2));
+    auto arg2 = getAs<InfixExpression>(array->elements[2].get());
+    testInfixExpression(arg2, int64_t(3), "+", int64_t(3));
 }

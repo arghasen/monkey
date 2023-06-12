@@ -54,6 +54,9 @@ CallExpression::CallExpression(lexer::Token tok)
 StringLiteral::StringLiteral(lexer::Token tok)
     : Expression(tok), value(tok.literal) {}
 
+ArrayLiteral::ArrayLiteral(lexer::Token tok)
+    : Expression(tok), elements{} {}
+
 std::string Expression::to_string() const { return token.literal; }
 
 std::string Program::to_string() const {
@@ -160,6 +163,19 @@ std::string CallExpression::to_string() const {
 
 std::string StringLiteral::to_string() const { return value; }
 
+std::string ArrayLiteral::to_string() const {
+  std::string out = "[";
+  if (elements.size() > 0) {
+    for (const auto &elem : elements) {
+      out += elem->to_string() + ", ";
+    }
+    out.pop_back();
+    out.pop_back();
+  }
+  out += "]";
+  return out;
+}
+
 constexpr StatementType LetStatement::Type() const {
   return StatementType::LET;
 }
@@ -199,6 +215,10 @@ constexpr ExpressionType CallExpression::Type() const {
 }
 constexpr ExpressionType StringLiteral::Type() const {
   return ExpressionType::STRING;
+}
+
+constexpr ExpressionType ArrayLiteral::Type() const {
+  return ExpressionType::ARRAY;
 }
 
 } // namespace ast
