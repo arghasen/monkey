@@ -118,11 +118,11 @@ std::string InfixExpression::to_string() const {
 std::string IfExpression::to_string() const {
   std::string out = "if";
   if (condition) {
-    out += condition->to_string();
+    out += " " + condition->to_string();
   }
   out += " " + consequence->to_string();
   if (alternative) {
-    out += "else " + alternative->to_string();
+    out += " else " + alternative->to_string();
   }
   return out;
 }

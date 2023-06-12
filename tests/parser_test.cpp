@@ -247,6 +247,13 @@ BOOST_AUTO_TEST_CASE(TestOperatorPrecedenceParsing) {
       {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))",
        "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
       {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
+      {"if (x) { y }", "if x y"},
+      {"if (x) { y } else { z }", "if x y else z"},
+      {"fn(x, y) { x + y; }", "fn(x, y) (x + y)"},
+      {"fn() { x + y; }", "fn() (x + y)"},
+      {"fn(x, y, z) { x + y + z; }", "fn(x, y, z) ((x + y) + z)"},
+      {R"(let x = "foobar";)", "let x = foobar;"},
+      {R"([1, 1+2,"foo", add(1,2), true])", "[1, (1 + 2), foo, add(1, 2), true]"}
   };
 
   for (auto [input, expectedResults] : tests) {
