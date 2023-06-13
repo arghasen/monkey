@@ -1,8 +1,6 @@
 #include "ast.hpp"
 
-namespace monkey {
-namespace parser {
-namespace ast {
+namespace monkey::parser::ast {
 
 std::string Program::TokenLiteral() const {
   if (statements.empty()) {
@@ -176,51 +174,4 @@ std::string ArrayLiteral::to_string() const {
   return out;
 }
 
-constexpr StatementType LetStatement::Type() const {
-  return StatementType::LET;
-}
-constexpr StatementType ReturnStatement::Type() const {
-  return StatementType::RETURN;
-}
-constexpr StatementType ExpressionStatement::Type() const {
-  return StatementType::EXPRESSION;
-}
-constexpr StatementType BlockStatement::Type() const {
-  return StatementType::BLOCK;
-}
-
-constexpr ExpressionType Identifier::Type() const {
-  return ExpressionType::IDENTIFIER;
-}
-constexpr ExpressionType IntegerLiteral::Type() const {
-  return ExpressionType::INTEGER;
-}
-constexpr ExpressionType PrefixExpression::Type() const {
-  return ExpressionType::PREFIX;
-}
-constexpr ExpressionType InfixExpression::Type() const {
-  return ExpressionType::INFIX;
-}
-constexpr ExpressionType Boolean::Type() const {
-  return ExpressionType::BOOLEAN;
-}
-constexpr ExpressionType IfExpression::Type() const {
-  return ExpressionType::IF;
-}
-constexpr ExpressionType FunctionLiteral::Type() const {
-  return ExpressionType::FUNCTION;
-}
-constexpr ExpressionType CallExpression::Type() const {
-  return ExpressionType::CALL;
-}
-constexpr ExpressionType StringLiteral::Type() const {
-  return ExpressionType::STRING;
-}
-
-constexpr ExpressionType ArrayLiteral::Type() const {
-  return ExpressionType::ARRAY;
-}
-
-} // namespace ast
-} // namespace parser
-} // namespace monkey
+} // namespace monkey::parser::ast

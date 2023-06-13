@@ -4,6 +4,8 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace monkey::lexer;
+using TT = TokenType;
+using TokenNames = std::pair<TT, std::string>;
 
 void checkTokens(std::string input, std::vector<Token> expectedTokens) {
   monkey::lexer::Lexer lexer(input);
@@ -18,11 +20,9 @@ BOOST_AUTO_TEST_CASE(TestNextToken) {
   auto input = "=+(){},;";
 
   std::vector<Token> testResults = {
-      {TokenType::ASSIGN, "="}, {TokenType::PLUS, "+"},
-      {TokenType::LPAREN, "("}, {TokenType::RPAREN, ")"},
-      {TokenType::LBRACE, "{"}, {TokenType::RBRACE, "}"},
-      {TokenType::COMMA, ","},  {TokenType::SEMICOLON, ";"},
-      {TokenType::EOFILE, ""}};
+      {TT::ASSIGN, "="}, {TT::PLUS, "+"},      {TT::LPAREN, "("},
+      {TT::RPAREN, ")"}, {TT::LBRACE, "{"},    {TT::RBRACE, "}"},
+      {TT::COMMA, ","},  {TT::SEMICOLON, ";"}, {TT::EOFILE, ""}};
   checkTokens(input, testResults);
 }
 
@@ -37,24 +37,18 @@ BOOST_AUTO_TEST_CASE(TestNextToken2) {
     )";
 
   std::vector<Token> testResults = {
-      {TokenType::LET, "let"},     {TokenType::IDENT, "five"},
-      {TokenType::ASSIGN, "="},    {TokenType::INT, "5"},
-      {TokenType::SEMICOLON, ";"}, {TokenType::LET, "let"},
-      {TokenType::IDENT, "ten"},   {TokenType::ASSIGN, "="},
-      {TokenType::INT, "10"},      {TokenType::SEMICOLON, ";"},
-      {TokenType::LET, "let"},     {TokenType::IDENT, "add"},
-      {TokenType::ASSIGN, "="},    {TokenType::FUNCTION, "fn"},
-      {TokenType::LPAREN, "("},    {TokenType::IDENT, "x"},
-      {TokenType::COMMA, ","},     {TokenType::IDENT, "y"},
-      {TokenType::RPAREN, ")"},    {TokenType::LBRACE, "{"},
-      {TokenType::IDENT, "x"},     {TokenType::PLUS, "+"},
-      {TokenType::IDENT, "y"},     {TokenType::SEMICOLON, ";"},
-      {TokenType::RBRACE, "}"},    {TokenType::SEMICOLON, ";"},
-      {TokenType::LET, "let"},     {TokenType::IDENT, "result"},
-      {TokenType::ASSIGN, "="},    {TokenType::IDENT, "add"},
-      {TokenType::LPAREN, "("},    {TokenType::IDENT, "five"},
-      {TokenType::COMMA, ","},     {TokenType::IDENT, "ten"},
-      {TokenType::RPAREN, ")"},    {TokenType::SEMICOLON, ";"}};
+      {TT::LET, "let"},      {TT::IDENT, "five"},  {TT::ASSIGN, "="},
+      {TT::INT, "5"},        {TT::SEMICOLON, ";"}, {TT::LET, "let"},
+      {TT::IDENT, "ten"},    {TT::ASSIGN, "="},    {TT::INT, "10"},
+      {TT::SEMICOLON, ";"},  {TT::LET, "let"},     {TT::IDENT, "add"},
+      {TT::ASSIGN, "="},     {TT::FUNCTION, "fn"}, {TT::LPAREN, "("},
+      {TT::IDENT, "x"},      {TT::COMMA, ","},     {TT::IDENT, "y"},
+      {TT::RPAREN, ")"},     {TT::LBRACE, "{"},    {TT::IDENT, "x"},
+      {TT::PLUS, "+"},       {TT::IDENT, "y"},     {TT::SEMICOLON, ";"},
+      {TT::RBRACE, "}"},     {TT::SEMICOLON, ";"}, {TT::LET, "let"},
+      {TT::IDENT, "result"}, {TT::ASSIGN, "="},    {TT::IDENT, "add"},
+      {TT::LPAREN, "("},     {TT::IDENT, "five"},  {TT::COMMA, ","},
+      {TT::IDENT, "ten"},    {TT::RPAREN, ")"},    {TT::SEMICOLON, ";"}};
   checkTokens(input, testResults);
 }
 
@@ -67,17 +61,13 @@ BOOST_AUTO_TEST_CASE(TestNextTokenOperators) {
     )";
 
   std::vector<Token> testResults = {
-      {TokenType::BANG, "!"},  {TokenType::MINUS, "-"},
-      {TokenType::SLASH, "/"}, {TokenType::ASTERISK, "*"},
-      {TokenType::INT, "5"},   {TokenType::SEMICOLON, ";"},
-      {TokenType::INT, "5"},   {TokenType::LT, "<"},
-      {TokenType::INT, "10"},  {TokenType::GT, ">"},
-      {TokenType::INT, "5"},   {TokenType::SEMICOLON, ";"},
-      {TokenType::INT, "10"},  {TokenType::EQ, "=="},
-      {TokenType::INT, "10"},  {TokenType::SEMICOLON, ";"},
-      {TokenType::INT, "10"},  {TokenType::NOT_EQ, "!="},
-      {TokenType::INT, "9"},   {TokenType::SEMICOLON, ";"},
-      {TokenType::EOFILE, ""}};
+      {TT::BANG, "!"},      {TT::MINUS, "-"},     {TT::SLASH, "/"},
+      {TT::ASTERISK, "*"},  {TT::INT, "5"},       {TT::SEMICOLON, ";"},
+      {TT::INT, "5"},       {TT::LT, "<"},        {TT::INT, "10"},
+      {TT::GT, ">"},        {TT::INT, "5"},       {TT::SEMICOLON, ";"},
+      {TT::INT, "10"},      {TT::EQ, "=="},       {TT::INT, "10"},
+      {TT::SEMICOLON, ";"}, {TT::INT, "10"},      {TT::NOT_EQ, "!="},
+      {TT::INT, "9"},       {TT::SEMICOLON, ";"}, {TT::EOFILE, ""}};
 
   checkTokens(input, testResults);
 }
@@ -92,15 +82,12 @@ BOOST_AUTO_TEST_CASE(TestNextTokenKeywords) {
     )";
 
   std::vector<Token> testResults = {
-      {TokenType::IF, "if"},       {TokenType::LPAREN, "("},
-      {TokenType::INT, "5"},       {TokenType::LT, "<"},
-      {TokenType::INT, "10"},      {TokenType::RPAREN, ")"},
-      {TokenType::LBRACE, "{"},    {TokenType::RETURN, "return"},
-      {TokenType::TRUE, "true"},   {TokenType::SEMICOLON, ";"},
-      {TokenType::RBRACE, "}"},    {TokenType::ELSE, "else"},
-      {TokenType::LBRACE, "{"},    {TokenType::RETURN, "return"},
-      {TokenType::FALSE, "false"}, {TokenType::SEMICOLON, ";"},
-      {TokenType::RBRACE, "}"},    {TokenType::EOFILE, ""}};
+      {TT::IF, "if"},       {TT::LPAREN, "("},      {TT::INT, "5"},
+      {TT::LT, "<"},        {TT::INT, "10"},        {TT::RPAREN, ")"},
+      {TT::LBRACE, "{"},    {TT::RETURN, "return"}, {TT::TRUE, "true"},
+      {TT::SEMICOLON, ";"}, {TT::RBRACE, "}"},      {TT::ELSE, "else"},
+      {TT::LBRACE, "{"},    {TT::RETURN, "return"}, {TT::FALSE, "false"},
+      {TT::SEMICOLON, ";"}, {TT::RBRACE, "}"},      {TT::EOFILE, ""}};
 
   checkTokens(input, testResults);
 }
@@ -111,65 +98,59 @@ BOOST_AUTO_TEST_CASE(TestNextTokenString) {
     "foo bar"
     )";
 
-  std::vector<Token> testResults = {{TokenType::STRING, "foobar"},
-                                    {TokenType::STRING, "foo bar"},
-                                    {TokenType::EOFILE, ""}};
+  std::vector<Token> testResults = {
+      {TT::STRING, "foobar"}, {TT::STRING, "foo bar"}, {TT::EOFILE, ""}};
 
   checkTokens(input, testResults);
 }
 
 BOOST_AUTO_TEST_CASE(TestTokenCheckConversionToString) {
-  std::unordered_map<TokenType, std::string> testResults = {
-      {TokenType::ILLEGAL, "ILLEGAL"},
-      {TokenType::EOFILE, "EOFILE"},
-      {TokenType::IDENT, "IDENT"},
-      {TokenType::INT, "INT"},
-      {TokenType::ASSIGN, "ASSIGN"},
-      {TokenType::PLUS, "PLUS"},
-      {TokenType::SEMICOLON, "SEMICOLON"},
-      {TokenType::LPAREN, "LPAREN"},
-      {TokenType::RPAREN, "RPAREN"},
-      {TokenType::LBRACE, "LBRACE"},
-      {TokenType::RBRACE, "RBRACE"},
-      {TokenType::FUNCTION, "FUNCTION"},
-      {TokenType::LET, "LET"},
-      {TokenType::BANG, "BANG"},
-      {TokenType::MINUS, "MINUS"},
-      {TokenType::SLASH, "SLASH"},
-      {TokenType::ASTERISK, "ASTERISK"},
-      {TokenType::LT, "LT"},
-      {TokenType::GT, "GT"},
-      {TokenType::IF, "IF"},
-      {TokenType::ELSE, "ELSE"},
-      {TokenType::RETURN, "RETURN"},
-      {TokenType::TRUE, "TRUE"},
-      {TokenType::FALSE, "FALSE"},
-      {TokenType::EQ, "EQ"},
-      {TokenType::NOT_EQ, "NOT_EQ"},
-      {TokenType::STRING, "STRING"},
-      {TokenType::SLASH, "SLASH"},
-      {TokenType::COMMA, "COMMA"},
-      {TokenType::TRUE, "TRUE"},
-      {TokenType::FALSE, "FALSE"}};
+  std::vector<TokenNames> testResults = {{TT::ILLEGAL, "ILLEGAL"},
+                                         {TT::EOFILE, "EOFILE"},
+                                         {TT::IDENT, "IDENT"},
+                                         {TT::INT, "INT"},
+                                         {TT::ASSIGN, "ASSIGN"},
+                                         {TT::PLUS, "PLUS"},
+                                         {TT::SEMICOLON, "SEMICOLON"},
+                                         {TT::LPAREN, "LPAREN"},
+                                         {TT::RPAREN, "RPAREN"},
+                                         {TT::LBRACE, "LBRACE"},
+                                         {TT::RBRACE, "RBRACE"},
+                                         {TT::FUNCTION, "FUNCTION"},
+                                         {TT::LET, "LET"},
+                                         {TT::BANG, "BANG"},
+                                         {TT::MINUS, "MINUS"},
+                                         {TT::SLASH, "SLASH"},
+                                         {TT::ASTERISK, "ASTERISK"},
+                                         {TT::LT, "LT"},
+                                         {TT::GT, "GT"},
+                                         {TT::IF, "IF"},
+                                         {TT::ELSE, "ELSE"},
+                                         {TT::RETURN, "RETURN"},
+                                         {TT::TRUE, "TRUE"},
+                                         {TT::FALSE, "FALSE"},
+                                         {TT::EQ, "EQ"},
+                                         {TT::NOT_EQ, "NOT_EQ"},
+                                         {TT::STRING, "STRING"},
+                                         {TT::SLASH, "SLASH"},
+                                         {TT::COMMA, "COMMA"},
+                                         {TT::TRUE, "TRUE"},
+                                         {TT::FALSE, "FALSE"}};
 
   for (auto &[tokenType, expectedString] : testResults) {
     BOOST_CHECK_EQUAL(to_string(tokenType), expectedString);
   }
 }
 
-BOOST_AUTO_TEST_CASE(TestArray){
-    auto input = R"(
+BOOST_AUTO_TEST_CASE(TestArray) {
+  auto input = R"(
         [1, 2];
         )";
-    
-    std::vector<Token> testResults = {
-        {TokenType::LBRACKET, "["},
-        {TokenType::INT, "1"},
-        {TokenType::COMMA, ","},
-        {TokenType::INT, "2"},
-        {TokenType::RBRACKET, "]"},
-        {TokenType::SEMICOLON, ";"},
-        {TokenType::EOFILE, ""}};
-    
-    checkTokens(input, testResults);
+
+  std::vector<Token> testResults = {{TT::LBRACKET, "["}, {TT::INT, "1"},
+                                    {TT::COMMA, ","},    {TT::INT, "2"},
+                                    {TT::RBRACKET, "]"}, {TT::SEMICOLON, ";"},
+                                    {TT::EOFILE, ""}};
+
+  checkTokens(input, testResults);
 }
